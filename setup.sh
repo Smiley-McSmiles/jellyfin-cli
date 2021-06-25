@@ -56,7 +56,7 @@ sudo systemctl enable --now jellyfin.service
 sudo systemctl status jellyfin.service
 echo
 
-echo "Removing git cloned directory...$DIRECTORY"
+echo "Removing git cloned directory:$DIRECTORY..."
 sudo rm -rf $DIRECTORY
 echo
 
