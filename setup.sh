@@ -54,10 +54,18 @@ fi
 echo "Enabling jellyfin.service..."
 sudo systemctl enable --now jellyfin.service
 sudo systemctl status jellyfin.service
+echo
 
+echo "Removing git cloned directory..."
+sudo rm -rf $DIRECTORY
+echo
+
+echo
+echo "DONE"
+echo
 echo "Navigate to https://localhost:8096/ in your Web Browser to claim your"
 echo "Jellyfin server"
 echo
-echo "To manage Jellyfin please use 'sudo systemctl start|stop|restart|enable|disable jellyfin'"
+echo "To manage Jellyfin use 'sudo systemctl start|stop|restart|enable|disable jellyfin'"
 echo
-echo "To update Jellyfin, please use 'sudo jellyfin-update'"
+echo "To update Jellyfin, use 'sudo jellyfin-update'"
