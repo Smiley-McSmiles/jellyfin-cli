@@ -8,7 +8,7 @@ OPERATION:
 
 INSTALL(LINUX):
   git clone https://github.com/Smiley-McSmiles/jellyfin-manager
-  cd jellyfin-manager
+  cd jellyfin-cli
   chmod ug+x setup.sh
   ./setup.sh
 
