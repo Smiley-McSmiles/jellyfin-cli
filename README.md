@@ -27,34 +27,24 @@ sudo ./setup.sh
 
 ## Usage
 
+```shell
 jellyfin - The CLI Tool
 -Created by Smiley McSmiles
 
 Syntax: jellyfin [b|d|e|h|p|r|s|S|u|X] [OPTIONS]
-
 options:
-
 -b     [DIRECTORY] Input directory to output backup archive
-
 -d     Disable jellyfin.service
-
 -e     Enable jellyfin.service
-
 -h     Print this Help
-
 -p     Reset the permissions of Jellyfin's Media Library
-
 -r     Restart jellyfin.service
-
 -s     Start jellyfin.service
-
 -S     Stop jellyfin.service
-
 -t     Status of jellyfin.service
-
 -u     Update Jellyfin
-
 -X     Uninstall Jellyfin Completely
+```
 
 ### License
 
