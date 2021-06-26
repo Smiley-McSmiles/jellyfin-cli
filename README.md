@@ -22,7 +22,7 @@
 git clone https://github.com/Smiley-McSmiles/jellyfin-cli
 cd jellyfin-cli
 chmod ug+x setup.sh
-./setup.sh
+sudo ./setup.sh
 ```
 
 ## Usage
