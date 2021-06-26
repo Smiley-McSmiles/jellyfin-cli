@@ -1,7 +1,7 @@
 ![jellyfin-cli](.github/banner-light.png?raw=true "Jellyfin Logo")
 ======
 
-> v-1.0 Distributed CLI tool for Jellyfin tar.gz installer
+> v-1.1 Distributed CLI tool for Jellyfin tar.gz installer
 
 ### Features
 
