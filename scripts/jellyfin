@@ -1,0 +1,151 @@
+#!/bin/bash
+source /opt/jellyfin/config/jellyfin.conf
+
+###############################################################################
+# FUNCTIONS                                                                   #
+###############################################################################
+
+Backup()
+{
+   # Backup /opt/jellyfin to passed directory
+   backupDirectory=$1
+   echo $backupDirectory
+}
+
+Help()
+{
+   # Display Help
+   echo "jellyfin - The CLI Tool"
+   echo "-Created by Smiley McSmiles"
+   echo 
+   echo "Syntax: jellyfin [b|d|e|h|p|r|s|S|u|X] [OPTIONS]"
+   echo "options:"
+   echo "-b     [DIRECTORY] Input directory to output backup archive"
+   echo "-d     Disable jellyfin.service"
+   echo "-e     Enable jellyfin.service"
+   echo "-h     Print this Help"
+   echo "-p     Reset the permissions of Jellyfin's Media Library"
+   echo "-r     Restart jellyfin.service"
+   echo "-s     Start jellyfin.service"
+   echo "-S     Stop jellyfin.service"
+   echo "-t     Status of jellyfin.service"
+   echo "-u     Update Jellyfin"
+   echo "-X     Uninstall Jellyfin Completely"
+   echo
+}
+
+Permissions()
+{
+   #Check if there is a recorded media library path for chown and chmod:
+   if [[ $defaultPath != /* ]]; then 
+	   echo "No default directory found..."
+	   echo "Please enter the root directory for your Media Library..."
+	   read defaultPath
+	   sed -i -e "s|defaultPath=|defaultPath=$defaultPath|g" /opt/jellyfin/config/jellyfin.conf
+   else 
+	   echo "defaultPath is set to $defaultPath";
+	fi
+   #Check if there is a recorded user/group for chown and chmod:
+   if id "$defaultUser" &>/dev/null; then
+	   echo "defaultUser is set to $defaultUser"
+   else
+	   echo "No default user found..."
+	   echo "Please enter the owner for this directory..."
+	   read defaultUser
+	   sed -i -e "s|defaultUser=|defaultUser=$defaultUser|g" /opt/jellyfin/config/jellyfin.conf
+   fi
+
+   chown -Rfv $defaultUser:$defaultUser $defaultPath
+   chmod 770 $defaultPath;
+}
+
+Update()
+{
+echo "Fetching newest Jellyfin version..."
+wget -O /opt/jellyfin/update/index.html https://repo.jellyfin.org/releases/server/linux/stable/combined/
+jellyfin_archive=$(grep 'tar.gz"' index.html | cut -d '"' -f 2)
+jellyfin=$(echo $jellyfin_archive | sed -r 's/.tar.gz//g')
+new_jellyfin_version=$(echo $jellyfin | sed -r 's/jellyfin_//g')
+rm /opt/jellyfin/update/index.html
+wget -O /opt/jellyfin/update/$jellyfin_archive https://repo.jellyfin.org/releases/server/linux/stable/combined/$jellyfin_archive
+
+echo "Unpacking $jellyfin_archive to /opt/jellyfin/..."
+tar xvzf /opt/jellyfin/update/$jellyfin_archive /opt/jellyfin/
+jellyfin -S
+unlink /opt/jellyfin/jellyfin
+ln -s /opt/jellyfin/$jellyfin /opt/jellyfin/jellyfin
+echo "moving $jellyfin_archive to /opt/jellyfin/old/$jellyfin_archive"
+mv -v /opt/jellyfin/update/$jellyfin_archive /opt/jellyfin/old/
+
+chown -R jellyfin:jellyfin /opt/jellyfin
+echo "Jellyfin updated to version $new_jellyfin_version"
+jellyfin -s -t
+}
+
+Uninstall()
+{
+   echo "******WARNING******"
+   echo "Are you completely sure?"
+   echo "This will delete all files relating"
+   echo "to Jellyfin, except the Media Library"
+   read -p "CONTINUE?: [yes/No]" toUninstallOrNotToUninstall
+   if [[ $toUninstallOrNotToUninstall == [yY][eE][sS] ]]; then
+      echo "Uninstalling..."
+      sleep 2
+      echo "...jk"
+   else
+      echo "Phew! That was a close one!"
+   fi
+}
+
+###############################################################################
+# FUNCTIONS END                                                               #
+###############################################################################
+
+has_sudo_access=""
+`timeout -k .1 .1 bash -c "sudo /bin/chmod --help" >&/dev/null 2>&1` >/dev/null 2>&1
+if [ $? -eq 0 ];then
+   has_sudo_access="YES"
+	sleep .1
+else
+   has_sudo_access="NO"
+	echo "$USER, you're not using sudo..."
+   echo "Please use 'sudo jellyfin [b|d|e|h|p|r|s|S|u|X] [OPTIONS]'"
+	Help
+	exit
+fi
+
+###############################################################################
+# MAIN                                                                        #
+###############################################################################
+if [ -n "$1" ]; then
+	echo
+else
+	echo "No parameters found."
+	Help
+	exit
+fi
+
+total=1
+while [ -n "$1" ]; do
+   case "$1" in
+      -b) Backup $2
+          shift ;;
+      -d) systemctl disable jellyfin.service ;;
+      -e) systemctl enable jellyfin.service ;;
+      -h) Help ;;
+      -p) Permissions ;;
+      -r) systemctl restart jellyfin.service ;;
+      -s) systemctl start jellyfin.service ;;
+      -S) systemctl stop jellyfin.service ;;
+      -t) systemctl status jellyfin.service ;;
+      -u) Update ;;
+      -X) Uninstall ;;
+      *) echo "Option $1 not recognized" 
+         Help ;;
+   esac
+   shift
+done
+###############################################################################
+# MAIN END                                                                    #
+###############################################################################

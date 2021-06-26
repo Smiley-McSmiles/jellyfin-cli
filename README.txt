@@ -1,11 +1,10 @@
-Jellyfin Manager:
+Jellyfin - The CLI Tool:
 OPERATION:
 -DESCRIPTION:
-  jellyfin-manager is simply an install and update script for jellyfin, specifically for 
+  jellyfin - The CLI Tool is simply an install and update script for jellyfin, specifically for 
   the jellyfin_x.tar.gz files hosted at:https://repo.jellyfin.org/releases/server/linux/stable/combined/
 -USAGE(LINUX):
-  jellyfin-update
-  jellyfin-uninstall
+  jellyfin -h
 
 INSTALL(LINUX):
   git clone https://github.com/Smiley-McSmiles/jellyfin-manager
@@ -14,6 +13,6 @@ INSTALL(LINUX):
   ./setup.sh
 
 UNINSTALL(LINUX):
-  jellyfin-uninstall
+  jellyfin -X
 
 Created by: Smiley McSmiles
