@@ -21,8 +21,18 @@ jellyfin_archive=$(grep 'tar.gz"' index.html | cut -d '"' -f 2)
 rm index.html
 wget https://repo.jellyfin.org/releases/server/linux/stable/combined/$jellyfin_archive
 jellyfin=$(echo $jellyfin_archive | sed -r 's/.tar.gz//g')
-adduser -rd /opt/jellyfin jellyfin
+
+
 mkdir /opt/jellyfin
+clear
+
+read -p "Please enter the default user for Jellyfin: " defaultUser
+adduser -rd /opt/jellyfin $defaultUser
+while id "$defaultUser" &>/dev/null; do
+   echo "Cannot create $defaultUser as $defaultUser already exists..."
+   read -p "Please re-enter a new default user for Jellyfin: " defaultUser
+done
+
 mkdir /opt/jellyfin/old
 mkdir /opt/jellyfin/update
 cp scripts/jellyfin /bin/
@@ -36,7 +46,7 @@ ln -s $jellyfin jellyfin
 mkdir data cache config log
 touch config/jellyfin.conf
 echo "defaultPath=" >> config/jellyfin.conf
-echo "defaultUser=" >> config/jellyfin.conf
+echo "defaultUser=$defaultUser" >> config/jellyfin.conf
 
 echo "Preparing to install needed dependancies for Jellyfin..."
 echo
@@ -53,7 +63,7 @@ else
 fi
 
 echo "Setting Permissions for Jellyfin..."
-chown -R jellyfin:jellyfin /opt/jellyfin
+chown -R $defaultUser:$defaultUser /opt/jellyfin
 chmod u+x jellyfin.sh
 chmod +x /bin/jellyfin
 
