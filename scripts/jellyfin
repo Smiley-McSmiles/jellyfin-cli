@@ -1,5 +1,4 @@
 #!/bin/bash
-source /opt/jellyfin/config/jellyfin.conf
 
 ###############################################################################
 # FUNCTIONS                                                                   #
@@ -7,9 +6,36 @@ source /opt/jellyfin/config/jellyfin.conf
 
 Backup()
 {
+   Has_sudo
    # Backup /opt/jellyfin to passed directory
    backupDirectory=$1
-   echo $backupDirectory
+   tarPath=
+   fileName=jellyfin-backup.tar
+   mkdir /opt/jellyfin/backup
+   cp /bin/jellyfin /opt/jellyfin/backup/
+   cp /etc/jellyfin.conf /opt/jellyfin/backup/
+   cp /usr/lib/systemd/system/jellyfin.service /opt/jellyfin/backup/
+   if [[ $(echo "${backupDirectory: -1}") == "/" ]]; then
+      tarPath=$backupDirectory$fileName
+      echo $tarPath
+   else
+      tarPath=$backupDirectory/$fileName
+      echo $tarPath
+   fi
+
+   time tar cvf $tarPath /opt/jellyfin
+   USER=$(stat -c '%U' $backupDirectory)
+   chown -f $USER:$USER $tarPath
+   chmod -f 770 $tarPath
+   echo "Your backup is: $tarPath"
+   tarSize=$(du -h $tarPath)
+   echo "Size: $tarSize"
+   echo
+   echo "To Import on your next setup, simply run:"
+   echo "git clone https://github.com/Smiley-McSmiles/jellyfin-cli"
+   echo "cd jellyfin-cli"
+   echo "chmod ug+x setup.sh"
+   echo "sudo ./setup.sh -i [Path to jellyfin-backup.tar]"
 }
 
 Help()
@@ -18,24 +44,84 @@ Help()
    echo "jellyfin - The CLI Tool"
    echo "-Created by Smiley McSmiles"
    echo 
-   echo "Syntax: jellyfin [b|d|e|h|p|r|s|S|u|X] [OPTIONS]"
+   echo "Syntax: jellyfin [b|d|e|h|i|p|r|s|S|u|X] [OPTIONS]"
    echo "options:"
    echo "-b     [DIRECTORY] Input directory to output backup archive"
-   echo "-d     Disable jellyfin.service"
-   echo "-e     Enable jellyfin.service"
+   echo "-d     Disable Jellyfin on System Start"
+   echo "-e     Enable Jellyfin on System Start"
    echo "-h     Print this Help"
+   echo "-i     [FILE.tar] Input file to Import jellyfin-backup.tar"
    echo "-p     Reset the permissions of Jellyfin's Media Library"
-   echo "-r     Restart jellyfin.service"
-   echo "-s     Start jellyfin.service"
-   echo "-S     Stop jellyfin.service"
-   echo "-t     Status of jellyfin.service"
+   echo "-r     Restart Jellyfin"
+   echo "-s     Start Jellyfin"
+   echo "-S     Stop Jellyfin"
+   echo "-t     Status of Jellyfin"
    echo "-u     Update Jellyfin"
    echo "-X     Uninstall Jellyfin Completely"
    echo
 }
 
+Import()
+{
+   Has_sudo
+   #Import jellyfin-backup.tar
+   importTar=$1
+   echo "******WARNING******"
+   echo "******CAUTION******"
+   echo "This procedure should only be used after a fresh install of Jellyfin"
+   echo "and Jellyfin-Manager. As this procedure will erase /opt/jellyfin COMPLETELY"
+   sleep 5
+   read -p "...Continue? [yes/No] :" importOrNotToImport
+   if [[ $importOrNotToImport == [yY][eE][sS] ]]; then
+      echo "IMPORTING $importTar"
+      jellyfin -S
+      rm -rf /opt/jellyfin
+      tar xvf $importTar -C /
+      clear
+      source /opt/jellyfin/config/jellyfin.conf
+      mv -f /opt/jellyfin/backup/jellyfin /bin/
+      chmod +x /bin/jellyfin
+      mv -f /opt/jellyfin/backup/jellyfin.service /usr/lib/systemd/system/
+      mv -f /opt/jellyfin/backup/jellyfin.conf /etc/
+      if id "$defaultUser" &>/dev/null; then 
+         chown -Rfv $defaultUser:$defaultUser /opt/jellyfin
+         chmod -Rfv 770 /opt/jellyfin
+         jellyfin -s -t
+      else
+         clear
+         echo "******WARNING******"
+         echo "*******ERROR*******"
+         echo "The imported default Jellyfin user($defaultUser) has not yet been created."
+         echo "This error is likely due to a read error of the /opt/jellyfin/config/jellyfin.conf file."
+         echo "The default user is usually created by Jellyfin - The CLI Tool, when running setup.sh."
+         echo "You may want to see who owns that configuration file with:"
+         echo "'ls /opt/jellyfin/config/jellyfin.conf'"
+         sleep 5
+         read -p "...Continue with $defaultUser? [yes/No] :" newUserOrOld
+         if [[ $newUserOrOld == [yY][eE][sS] ]]; then
+            echo "Great!"
+            sleep .5
+            chown -Rfv $defaultUser:$defaultUser /opt/jellyfin
+            chmod -Rfv 770 /opt/jellyfin
+            jellyfin -s -t
+         else
+            read -p "No? Which user should own /opt/jellyfin?: " defaultUser
+            echo "Well... I should've known $defaultUser would be the one..."
+            sleep 1
+            chown -Rfv $defaultUser:$defaultUser /opt/jellyfin
+            chmod -Rfv 770 /opt/jellyfin
+            jellyfin -s -t
+         fi
+      fi
+
+   else
+      echo "Returning..."
+   fi    
+}
+
 Permissions()
 {
+   Has_sudo
    #Check if there is a recorded media library path for chown and chmod:
    if [[ $defaultPath != /* ]]; then 
 	   echo "No default directory found..."
@@ -61,40 +147,60 @@ Permissions()
 
 Update()
 {
-echo "Fetching newest Jellyfin version..."
-wget -O /opt/jellyfin/update/index.html https://repo.jellyfin.org/releases/server/linux/stable/combined/
-jellyfin_archive=$(grep 'tar.gz"' index.html | cut -d '"' -f 2)
-jellyfin=$(echo $jellyfin_archive | sed -r 's/.tar.gz//g')
-new_jellyfin_version=$(echo $jellyfin | sed -r 's/jellyfin_//g')
-rm /opt/jellyfin/update/index.html
-wget -O /opt/jellyfin/update/$jellyfin_archive https://repo.jellyfin.org/releases/server/linux/stable/combined/$jellyfin_archive
+   Has_sudo
+   echo "Fetching newest Jellyfin version..."
+   wget -O /opt/jellyfin/update/index.html https://repo.jellyfin.org/releases/server/linux/stable/combined/
+   jellyfin_archive=$(grep 'tar.gz"' index.html | cut -d '"' -f 2)
+   jellyfin=$(echo $jellyfin_archive | sed -r 's/.tar.gz//g')
+   new_jellyfin_version=$(echo $jellyfin | sed -r 's/jellyfin_//g')
+   rm /opt/jellyfin/update/index.html
+   wget -O /opt/jellyfin/update/$jellyfin_archive https://repo.jellyfin.org/releases/server/linux/stable/combined/$jellyfin_archive
 
-echo "Unpacking $jellyfin_archive to /opt/jellyfin/..."
-tar xvzf /opt/jellyfin/update/$jellyfin_archive /opt/jellyfin/
-jellyfin -S
-unlink /opt/jellyfin/jellyfin
-ln -s /opt/jellyfin/$jellyfin /opt/jellyfin/jellyfin
-echo "moving $jellyfin_archive to /opt/jellyfin/old/$jellyfin_archive"
-mv -v /opt/jellyfin/update/$jellyfin_archive /opt/jellyfin/old/
+   echo "Unpacking $jellyfin_archive to /opt/jellyfin/..."
+   tar xvzf /opt/jellyfin/update/$jellyfin_archive /opt/jellyfin/
+   jellyfin -S
+   unlink /opt/jellyfin/jellyfin
+   ln -s /opt/jellyfin/$jellyfin /opt/jellyfin/jellyfin
+   echo "moving $jellyfin_archive to /opt/jellyfin/old/$jellyfin_archive"
+   mv -v /opt/jellyfin/update/$jellyfin_archive /opt/jellyfin/old/
 
-chown -R jellyfin:jellyfin /opt/jellyfin
-echo "Jellyfin updated to version $new_jellyfin_version"
-jellyfin -s -t
+   chown -R jellyfin:jellyfin /opt/jellyfin
+   echo "Jellyfin updated to version $new_jellyfin_version"
+   jellyfin -s -t
 }
 
 Uninstall()
 {
+   Has_sudo
    echo "******WARNING******"
+   echo "******CAUTION******"
    echo "Are you completely sure?"
-   echo "This will delete all files relating"
-   echo "to Jellyfin, except the Media Library"
+   echo "This will delete all files relating to Jellyfin, except"
+   echo "the Media Library and jellyfin-backup.tar"
    read -p "CONTINUE?: [yes/No]" toUninstallOrNotToUninstall
    if [[ $toUninstallOrNotToUninstall == [yY][eE][sS] ]]; then
-      echo "Uninstalling..."
-      sleep 2
-      echo "...jk"
+      echo "Goodbye..."
+      sleey 1
+      rm -rfv /opt/jellyfin
+      rm -fv /etc/jellyfin.conf
+      rm -fv /bin/jellyfin 
    else
       echo "Phew! That was a close one!"
+   fi
+}
+
+Has_sudo()
+{
+   has_sudo_access=""
+   `timeout -k .1 .1 bash -c "sudo /bin/chmod --help" >&/dev/null 2>&1` >/dev/null 2>&1
+   if [ $? -eq 0 ];then
+      has_sudo_access="YES"
+      source /opt/jellyfin/config/jellyfin.conf
+   else
+      has_sudo_access="NO"
+	   echo "$USER, you're not using sudo..."
+      echo "Please use 'sudo jellyfin [b|d|e|h|p|r|s|S|u|X] [OPTIONS]'"
+	   exit
    fi
 }
 
@@ -102,50 +208,39 @@ Uninstall()
 # FUNCTIONS END                                                               #
 ###############################################################################
 
-has_sudo_access=""
-`timeout -k .1 .1 bash -c "sudo /bin/chmod --help" >&/dev/null 2>&1` >/dev/null 2>&1
-if [ $? -eq 0 ];then
-   has_sudo_access="YES"
-	sleep .1
-else
-   has_sudo_access="NO"
-	echo "$USER, you're not using sudo..."
-   echo "Please use 'sudo jellyfin [b|d|e|h|p|r|s|S|u|X] [OPTIONS]'"
-	Help
-	exit
-fi
 
 ###############################################################################
 # MAIN                                                                        #
 ###############################################################################
 if [ -n "$1" ]; then
-	echo
+   total=1
+   while [ -n "$1" ]; do
+      case "$1" in
+         -b) Backup $2
+             shift ;;
+         -d) systemctl disable jellyfin.service ;;
+         -e) systemctl enable jellyfin.service ;;
+         -h) Help ;;
+         -i) Import $2
+             shift;;
+         -p) Permissions ;;
+         -r) systemctl restart jellyfin.service ;;
+         -s) systemctl start jellyfin.service ;;
+         -S) systemctl stop jellyfin.service ;;
+         -t) systemctl status jellyfin.service ;;
+         -u) Update ;;
+         -X) Uninstall ;;
+         *) echo "Option $1 not recognized" 
+            Help ;;
+      esac
+      shift
+   done
 else
 	echo "No parameters found."
 	Help
 	exit
 fi
 
-total=1
-while [ -n "$1" ]; do
-   case "$1" in
-      -b) Backup $2
-          shift ;;
-      -d) systemctl disable jellyfin.service ;;
-      -e) systemctl enable jellyfin.service ;;
-      -h) Help ;;
-      -p) Permissions ;;
-      -r) systemctl restart jellyfin.service ;;
-      -s) systemctl start jellyfin.service ;;
-      -S) systemctl stop jellyfin.service ;;
-      -t) systemctl status jellyfin.service ;;
-      -u) Update ;;
-      -X) Uninstall ;;
-      *) echo "Option $1 not recognized" 
-         Help ;;
-   esac
-   shift
-done
 ###############################################################################
 # MAIN END                                                                    #
 ###############################################################################

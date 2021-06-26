@@ -31,17 +31,18 @@ sudo ./setup.sh
 jellyfin - The CLI Tool
 -Created by Smiley McSmiles
 
-Syntax: jellyfin [b|d|e|h|p|r|s|S|u|X] [OPTIONS]
+Syntax: jellyfin [b|d|e|h|i|p|r|s|S|u|X] [OPTIONS]
 options:
 -b     [DIRECTORY] Input directory to output backup archive
--d     Disable jellyfin.service
--e     Enable jellyfin.service
+-d     Disable Jellyfin on System Start
+-e     Enable Jellyfin on System Start
 -h     Print this Help
+-i     [FILE.tar] Input file to Import jellyfin-backup.tar
 -p     Reset the permissions of Jellyfin's Media Library
--r     Restart jellyfin.service
--s     Start jellyfin.service
--S     Stop jellyfin.service
--t     Status of jellyfin.service
+-r     Restart Jellyfin
+-s     Start Jellyfin
+-S     Stop Jellyfin
+-t     Status of Jellyfin
 -u     Update Jellyfin
 -X     Uninstall Jellyfin Completely
 ```
@@ -49,3 +50,4 @@ options:
 ### License
 
    This project is licensed under the [GPL V3.0 License](https://github.com/Smiley-McSmiles/jellyfin-cli/blob/main/LICENSE).
+

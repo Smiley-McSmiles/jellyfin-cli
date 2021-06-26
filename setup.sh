@@ -1,8 +1,6 @@
 #!/bin/bash
 DIRECTORY=$(cd `dirname $0` && pwd)
-
 has_sudo_access=""
-
 `timeout -k .1 .1 bash -c "sudo /bin/chmod --help" >&/dev/null 2>&1` >/dev/null 2>&1
 if [ $? -eq 0 ];then
    has_sudo_access="YES"
@@ -15,6 +13,70 @@ else
 	exit
 fi
 
+Import()
+{
+   Has_sudo
+   #Import jellyfin-backup.tar
+   importTar=$1
+   echo "******WARNING******"
+   echo "******CAUTION******"
+   echo "This procedure should only be used after a fresh install of Jellyfin"
+   echo "and Jellyfin-Manager. As this procedure will erase /opt/jellyfin COMPLETELY"
+   sleep 5
+   read -p "...Continue? [yes/No] :" importOrNotToImport
+   if [[ $importOrNotToImport == [yY][eE][sS] ]]; then
+      echo "IMPORTING $importTar"
+      jellyfin -S
+      rm -rf /opt/jellyfin
+      tar xvf $importTar -C /
+      clear
+      source /opt/jellyfin/config/jellyfin.conf
+      mv -f /opt/jellyfin/backup/jellyfin /bin/
+      chmod +x /bin/jellyfin
+      mv -f /opt/jellyfin/backup/jellyfin.service /usr/lib/systemd/system/
+      mv -f /opt/jellyfin/backup/jellyfin.conf /etc/
+      if id "$defaultUser" &>/dev/null; then 
+         chown -Rfv $defaultUser:$defaultUser /opt/jellyfin
+         chmod -Rfv 770 /opt/jellyfin
+         jellyfin -s -t
+      else
+         clear
+         echo "******WARNING******"
+         echo "*******ERROR*******"
+         echo "The imported default Jellyfin user($defaultUser) has not yet been created."
+         echo "This error is likely due to a read error of the /opt/jellyfin/config/jellyfin.conf file."
+         echo "The default user is usually created by Jellyfin - The CLI Tool, when running setup.sh."
+         echo "You may want to see who owns that configuration file with:"
+         echo "'ls /opt/jellyfin/config/jellyfin.conf'"
+         sleep 5
+         read -p "...Continue with $defaultUser? [yes/No] :" newUserOrOld
+         if [[ $newUserOrOld == [yY][eE][sS] ]]; then
+            echo "Great!"
+            sleep .5
+            chown -Rfv $defaultUser:$defaultUser /opt/jellyfin
+            chmod -Rfv 770 /opt/jellyfin
+            jellyfin -s -t
+         else
+            read -p "No? Which user should own /opt/jellyfin?: " defaultUser
+            echo "Well... I should've known $defaultUser would be the one..."
+            sleep 1
+            chown -Rfv $defaultUser:$defaultUser /opt/jellyfin
+            chmod -Rfv 770 /opt/jellyfin
+            jellyfin -s -t
+         fi
+      fi
+
+   else
+      echo "Returning..."
+   fi    
+}
+
+if [ -n "$1" ]; then
+   Import $2
+   rm -rf $DIRECTORY
+   exit
+fi
+
 echo "Fetching newest Jellyfin version..."
 wget https://repo.jellyfin.org/releases/server/linux/stable/combined/
 jellyfin_archive=$(grep 'tar.gz"' index.html | cut -d '"' -f 2)
@@ -22,19 +84,18 @@ rm index.html
 wget https://repo.jellyfin.org/releases/server/linux/stable/combined/$jellyfin_archive
 jellyfin=$(echo $jellyfin_archive | sed -r 's/.tar.gz//g')
 
-
 mkdir /opt/jellyfin
 clear
 
 read -p "Please enter the default user for Jellyfin: " defaultUser
-adduser -rd /opt/jellyfin $defaultUser
 while id "$defaultUser" &>/dev/null; do
    echo "Cannot create $defaultUser as $defaultUser already exists..."
    read -p "Please re-enter a new default user for Jellyfin: " defaultUser
 done
+adduser -rd /opt/jellyfin $defaultUser
 
-mkdir /opt/jellyfin/old
-mkdir /opt/jellyfin/update
+mkdir /opt/jellyfin/old /opt/jellyfin/update /opt/jellyfin/backup
+cp jellyfin.1 /usr/local/share/man/man1/
 cp scripts/jellyfin /bin/
 cp scripts/jellyfin.sh /opt/jellyfin/
 cp $jellyfin_archive /opt/jellyfin/

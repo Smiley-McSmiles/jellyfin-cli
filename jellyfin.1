@@ -1,0 +1,66 @@
+." Process this file with
+." groff -man -Tascii jellyfin.1
+."
+.TH jellyfin
+
+.Sh NAME
+.B jellyfin
+- Distributed CLI tool for Jellyfin tar.gz installer
+
+.SH SYNOPSIS
+.B jellyfin
+
+.SH DESCRIPTION
+.B jellyfin
+is a set of scripts to install and update the jellyfin-combined tar.gz
+
+.SH USAGE
+.B SYNTAX
+- jellyfin [b|d|e|h|i|p|r|s|S|u|X] [OPTIONS]
+.TP
+.SS OPTIONS
+.TP
+.B -b     [DIRECTORY] Input directory to output backup archive
+.TP
+.B -d     Disable Jellyfin on System Start
+.TP
+.B -e     Enable Jellyfin on System Start
+.TP
+.B -h     Print this Help
+.TP
+.B -i     [FILE.tar] Input file to Import jellyfin-backup.tar
+.TP
+.B -p     Reset the permissions of Jellyfin's Media Library
+.TP
+.B -r     Restart Jellyfin
+.TP
+.B -s     Start Jellyfin
+.TP
+.B -S     Stop Jellyfin
+.TP
+.B -t     Status of Jellyfin
+.TP
+.B -u     Update Jellyfin
+.TP
+.B -X     Uninstall Jellyfin Completely
+
+.SH FILES
+.TP
+.I
+/opt/jellyfin
+.TP
+.I
+/etc/jellyfin.conf
+.TP
+.I
+/bin/jellyfin
+
+.SH COPYRIGHT
+.PP
+Copyright 2021 Smiley McSmiles. All rights reserved
+https://www.github.com/Smiley-McSmiles/jellyfin-cli
+
+.SH CREDITS
+.PP
+This man page was created by Smiley McSmiles <SmileyMcSmiles@ProtonMail.com>
+
