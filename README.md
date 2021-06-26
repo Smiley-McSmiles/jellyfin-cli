@@ -14,6 +14,7 @@
 * **Restart** - Restart the jellyfin.service.
 * **Status** - Get status information on jellyfin.service.
 * **Backup** - Input a directroy to output the backup archive.
+* **Import** - Import a .tar file to pick up where you left off on another system
 * **Uninstall** - Uninstalls Jellyfin completely (Ignores the Media Directory).
 
 ### Getting Started
