@@ -166,7 +166,7 @@ Update()
    mv -v /opt/jellyfin/update/$jellyfin_archive /opt/jellyfin/old/
    rm -rfv /opt/jellyfin/update
 
-   chown -R jellyfin:jellyfin /opt/jellyfin
+   chown -R $defaultUser:$defaultUser /opt/jellyfin
    echo "Jellyfin updated to version $new_jellyfin_version"
    jellyfin -s -t
 }
