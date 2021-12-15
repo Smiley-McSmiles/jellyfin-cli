@@ -2,8 +2,7 @@
 ======
 
 > v-1.2 Distributed CLI tool for Jellyfin tar.gz installer
-> Tested on Fedora 34
-> Tested on Fedora 35
+> Tested on Fedora 34 & Fedora 35
 
 ### Features
 
