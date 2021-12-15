@@ -8,6 +8,7 @@
 
 * **Setup** - Sets up the initial install.
 * **Update** - Downloads and updates the current Jellyfin version.
+* **Update-cli** - Updates this Jellyfin CLI Tool
 * **Disable** - Disable the jellyfin.service.
 * **Enable** - Enable the jellyfin.service
 * **Start** - Start the jellyfin.service.
@@ -46,6 +47,7 @@ options:
 -S     Stop Jellyfin
 -t     Status of Jellyfin
 -u     Update Jellyfin
+-U     Update Jellyfin - The CLI Tool
 -X     Uninstall Jellyfin Completely
 ```
 
