@@ -197,6 +197,7 @@ Update-cli()
    echo "Updating Jellyfin - The CLI Tool"
    git clone https://github.com/Smiley-McSmiles/jellyfin-cli
    cp -f jellyfin-cli/scripts/jellyfin /usr/bin/
+   cp -f jellyfin-cli/jellyfin.1 /usr/local/share/man/man1/
    rm -rf jellyfin-cli
    echo "...complete"
 }
