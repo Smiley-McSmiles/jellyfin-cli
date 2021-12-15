@@ -68,8 +68,8 @@ Import()
    importTar=$1
    echo "******WARNING******"
    echo "******CAUTION******"
-   echo "This procedure should only be used as a fresh install of Jellyfin"
-   echo "and Jellyfin-Manager. As this procedure will erase /opt/jellyfin COMPLETELY"
+   echo "This procedure should only be used as a fresh install of Jellyfin."
+   echo "As this procedure will erase /opt/jellyfin COMPLETELY."
    sleep 5
    read -p "...Continue? [yes/No] :" importOrNotToImport
    if [[ $importOrNotToImport == [yY][eE][sS] ]]; then
