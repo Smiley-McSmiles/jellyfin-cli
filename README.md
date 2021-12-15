@@ -1,7 +1,9 @@
 ![jellyfin-cli](.github/banner-light.png?raw=true "Jellyfin Logo")
 ======
 
-> v-1.2 Distributed CLI tool for Jellyfin tar.gz installer (Only Tested on Fedora 34)
+> v-1.2 Distributed CLI tool for Jellyfin tar.gz installer
+> Tested on Fedora 34
+> Tested on Fedora 35
 
 ### Features
 
