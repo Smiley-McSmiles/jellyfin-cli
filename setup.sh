@@ -79,10 +79,10 @@ fi
 
 echo "Fetching newest Jellyfin version..."
 wget https://repo.jellyfin.org/releases/server/linux/stable/combined/
-jellyfin_archive=$(grep 'tar.gz"' index.html | cut -d '"' -f 2)
+jellyfin_archive=$(grep 'amd64.tar.gz"' index.html | cut -d '"' -f 2)
 rm index.html
 wget https://repo.jellyfin.org/releases/server/linux/stable/combined/$jellyfin_archive
-jellyfin=$(echo $jellyfin_archive | sed -r 's/.tar.gz//g')
+jellyfin=$(echo $jellyfin_archive | sed -r 's/_amd64.tar.gz//g')
 
 mkdir /opt/jellyfin
 clear
@@ -94,7 +94,7 @@ while id "$defaultUser" &>/dev/null; do
 done
 adduser -rd /opt/jellyfin $defaultUser
 
-mkdir /opt/jellyfin/old /opt/jellyfin/update /opt/jellyfin/backup
+mkdir /opt/jellyfin/old /opt/jellyfin/backup
 cp jellyfin.1 /usr/local/share/man/man1/
 cp scripts/jellyfin /bin/
 cp scripts/jellyfin.sh /opt/jellyfin/
