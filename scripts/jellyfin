@@ -57,6 +57,7 @@ Help()
    echo "-S     Stop Jellyfin"
    echo "-t     Status of Jellyfin"
    echo "-u     Update Jellyfin"
+   echo "-U     Update Jellyfin - The CLI Tool"
    echo "-X     Uninstall Jellyfin Completely"
    echo
 }
