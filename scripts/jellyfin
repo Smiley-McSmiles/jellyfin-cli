@@ -191,6 +191,16 @@ Uninstall()
    fi
 }
 
+Update-cli()
+{
+   Has_sudo
+   echo "Updating Jellyfin - The CLI Tool"
+   git clone https://github.com/Smiley-McSmiles/jellyfin-cli
+   cp -f jellyfin-cli/scripts/jellyfin /usr/bin/
+   rm -rf jellyfin-cli
+   echo "...complete"
+}
+
 Has_sudo()
 {
    has_sudo_access=""
@@ -231,6 +241,7 @@ if [ -n "$1" ]; then
          -S) systemctl stop jellyfin.service ;;
          -t) systemctl status jellyfin.service ;;
          -u) Update ;;
+         -U) Update-cli ;;
          -X) Uninstall ;;
          *) echo "Option $1 not recognized" 
             Help ;;
