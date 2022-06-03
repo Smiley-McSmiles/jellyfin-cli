@@ -180,7 +180,7 @@ Update_beta()
    echo "Fetching newest Jellyfin version..."
    mkdir /opt/jellyfin/update
    wget -O /opt/jellyfin/update/index.html https://repo.jellyfin.org/releases/server/linux/stable-pre/
-   jellyfin_archive=$(grep 'amd64.tar.gz' index.html | grep 'combined' | cut -d '/' -f5 | cut -d '<' -f1 | head -n 1)
+   jellyfin_archive=$(grep 'amd64.tar.gz' /opt/jellyfin/update/index.html | grep 'combined' | cut -d '/' -f5 | cut -d '<' -f1 | head -n 1)
    jellyfin=$(echo $jellyfin_archive | sed -r 's/_amd64.tar.gz//g')
    new_jellyfin_version=$(echo $jellyfin | sed -r 's/jellyfin_//g')
    rm -f /opt/jellyfin/update/index.html
