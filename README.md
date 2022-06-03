@@ -9,6 +9,7 @@
 * **Setup** - Sets up the initial install.
 * **Update** - Downloads and updates the current Jellyfin version.
 * **Update-cli** - Updates this Jellyfin CLI Tool
+* **Update Beta** Downloads and updates to the current Jellyfin Beta version.
 * **Disable** - Disable the jellyfin.service.
 * **Enable** - Enable the jellyfin.service
 * **Start** - Start the jellyfin.service.
@@ -34,7 +35,7 @@ sudo ./setup.sh
 jellyfin - The CLI Tool
 -Created by Smiley McSmiles
 
-Syntax: jellyfin -[b|d|e|h|i|p|r|s|S|u|U|X] [OPTIONS]
+Syntax: jellyfin -[b|d|e|h|i|p|r|s|S|u|U|-ub|X] [OPTIONS]
 options:
 -b     [DIRECTORY] Input directory to output backup archive
 -d     Disable Jellyfin on System Start
@@ -48,6 +49,7 @@ options:
 -t     Status of Jellyfin
 -u     Update Jellyfin
 -U     Update Jellyfin - The CLI Tool
+-ub    Update Jellyfin to the most recent Beta
 -X     Uninstall Jellyfin Completely
 ```
 
