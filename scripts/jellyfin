@@ -58,6 +58,7 @@ Help()
    echo "-t     Status of Jellyfin"
    echo "-u     Update Jellyfin"
    echo "-U     Update Jellyfin - The CLI Tool"
+   echo "-ub    Update Jellyfin to the most recent Beta"
    echo "-X     Uninstall Jellyfin Completely"
    echo
 }
@@ -172,6 +173,33 @@ Update()
    jellyfin -s -t
 }
 
+
+Update_beta()
+{
+   Has_sudo
+   echo "Fetching newest Jellyfin version..."
+   mkdir /opt/jellyfin/update
+   wget -O /opt/jellyfin/update/index.html https://repo.jellyfin.org/releases/server/linux/stable-pre/
+   jellyfin_archive=$(grep 'amd64.tar.gz' index.html | grep 'combined' | cut -d '/' -f5 | cut -d '<' -f1 | head -n 1)
+   jellyfin=$(echo $jellyfin_archive | sed -r 's/_amd64.tar.gz//g')
+   new_jellyfin_version=$(echo $jellyfin | sed -r 's/jellyfin_//g')
+   rm -f /opt/jellyfin/update/index.html
+   wget -O /opt/jellyfin/update/$jellyfin_archive https://repo.jellyfin.org/releases/server/linux/stable-pre/$jellyfin_archive
+
+   echo "Unpacking $jellyfin_archive to /opt/jellyfin/..."
+   tar xvzf /opt/jellyfin/update/$jellyfin_archive -C /opt/jellyfin/
+   jellyfin -S
+   unlink /opt/jellyfin/jellyfin
+   ln -s /opt/jellyfin/$jellyfin /opt/jellyfin/jellyfin
+   echo "moving $jellyfin_archive to /opt/jellyfin/old/$jellyfin_archive"
+   mv -v /opt/jellyfin/update/$jellyfin_archive /opt/jellyfin/old/
+   rm -rfv /opt/jellyfin/update
+
+   chown -R $defaultUser:$defaultUser /opt/jellyfin
+   echo "Jellyfin updated to version $new_jellyfin_version"
+   jellyfin -s -t
+}
+
 Uninstall()
 {
    Has_sudo
@@ -244,6 +272,7 @@ if [ -n "$1" ]; then
          -t) systemctl status jellyfin.service ;;
          -u) Update ;;
          -U) Update-cli ;;
+	 -ub) Update_beta ;;
          -X) Uninstall ;;
          *) echo "Option $1 not recognized" 
             Help ;;
