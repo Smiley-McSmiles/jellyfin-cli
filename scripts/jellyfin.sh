@@ -1,5 +1,4 @@
 #!/bin/bash
-#!/bin/bash
 JELLYFINDIR=/opt/jellyfin 
 FFMPEGDIR=/usr/share/ffmpeg 
 
