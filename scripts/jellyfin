@@ -44,7 +44,7 @@ Help()
    echo "jellyfin - The CLI Tool"
    echo "-Created by Smiley McSmiles"
    echo 
-   echo "Syntax: jellyfin -[b|d|e|h|i|p|r|s|S|u|U|X] [OPTIONS]"
+   echo "Syntax: jellyfin -[b|d|e|h|i|p|r|s|S|u|U|-ub|X] [OPTIONS]"
    echo "options:"
    echo "-b     [DIRECTORY] Input directory to output backup archive"
    echo "-d     Disable Jellyfin on System Start"
