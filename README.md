@@ -1,14 +1,14 @@
 ![jellyfin-cli](.github/banner-light.png?raw=true "Jellyfin Logo")
 ======
 
-> v-1.2.1 Distributed CLI tool for Jellyfin tar.gz installer
+> v-1.3 Distributed CLI tool for Jellyfin tar.gz installer
 > Tested on Fedora 34 & Fedora 35
 
 ### Features
 
 * **Setup** - Sets up the initial install.
 * **Update** - Downloads and updates the current Jellyfin version.
-* **Update-cli** - Updates this Jellyfin CLI Tool
+* **Update-cli** - Updates this Jellyfin CLI Tool.
 * **Update Beta** Downloads and updates to the current Jellyfin Beta version.
 * **Disable** - Disable the jellyfin.service.
 * **Enable** - Enable the jellyfin.service
@@ -17,7 +17,8 @@
 * **Restart** - Restart the jellyfin.service.
 * **Status** - Get status information on jellyfin.service.
 * **Backup** - Input a directroy to output the backup archive.
-* **Import** - Import a .tar file to pick up where you left off on another system
+* **Import** - Import a .tar file to pick up where you left off on another system.
+* **Get Version** - Get the current version of Jellyfin.
 * **Uninstall** - Uninstalls Jellyfin completely (Ignores the Media Directory).
 
 ### Getting Started
@@ -50,6 +51,7 @@ options:
 -u     Update Jellyfin
 -U     Update Jellyfin - The CLI Tool
 -ub    Update Jellyfin to the most recent Beta
+-v     Get the current version of Jellyfin.
 -X     Uninstall Jellyfin Completely
 ```
 

@@ -38,6 +38,24 @@ Backup()
    echo "sudo ./setup.sh -i [Path to jellyfin-backup.tar]"
 }
 
+Check_Version()
+{
+   source /opt/jellyfin/config/jellyfin.conf
+   if [ $jellyfin == $currentVersion ];then
+      echo "The installed version of Jellyfin matches the newest version available."
+      echo "$currentVersion"
+      exit
+   else
+      echo "Newer Jellyfin version found..."
+   fi
+}
+
+Get_version()
+{
+   source /opt/jellyfin/config/jellyfin.conf
+   echo "$currentVersion"
+}
+
 Help()
 {
    # Display Help
@@ -157,6 +175,7 @@ Update()
    jellyfin=$(echo $jellyfin_archive | sed -r 's/_amd64.tar.gz//g')
    new_jellyfin_version=$(echo $jellyfin | sed -r 's/jellyfin_//g')
    rm -f /opt/jellyfin/update/index.html
+   Check_Version
    wget -O /opt/jellyfin/update/$jellyfin_archive https://repo.jellyfin.org/releases/server/linux/stable/combined/$jellyfin_archive
 
    echo "Unpacking $jellyfin_archive to /opt/jellyfin/..."
@@ -170,6 +189,7 @@ Update()
 
    chown -R $defaultUser:$defaultUser /opt/jellyfin
    echo "Jellyfin updated to version $new_jellyfin_version"
+   sed -i -e "s|currentVersion=|currentVersion=$jellyfin|g" /opt/jellyfin/config/jellyfin.conf
    jellyfin -s -t
 }
 
@@ -184,6 +204,7 @@ Update_beta()
    jellyfin=$(echo $jellyfin_archive | sed -r 's/_amd64.tar.gz//g')
    new_jellyfin_version=$(echo $jellyfin | sed -r 's/jellyfin_//g')
    rm -f /opt/jellyfin/update/index.html
+   Check_Version
    wget -O /opt/jellyfin/update/$jellyfin_archive https://repo.jellyfin.org/releases/server/linux/stable-pre/$new_jellyfin_version/combined/$jellyfin_archive
 
    echo "Unpacking $jellyfin_archive to /opt/jellyfin/..."
@@ -197,6 +218,7 @@ Update_beta()
 
    chown -R $defaultUser:$defaultUser /opt/jellyfin
    echo "Jellyfin updated to version $new_jellyfin_version"
+   sed -i -e "s|currentVersion=|currentVersion=$jellyfin|g" /opt/jellyfin/config/jellyfin.conf
    jellyfin -s -t
 }
 
@@ -273,6 +295,7 @@ if [ -n "$1" ]; then
          -u) Update ;;
          -U) Update-cli ;;
 	 -ub) Update_beta ;;
+	 -v) Get_version ;;
          -X) Uninstall ;;
          *) echo "Option $1 not recognized" 
             Help ;;

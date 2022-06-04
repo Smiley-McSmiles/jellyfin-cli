@@ -47,7 +47,7 @@ Import()
          echo "This error is likely due to a read error of the /opt/jellyfin/config/jellyfin.conf file."
          echo "The default user is usually created by Jellyfin - The CLI Tool, when running setup.sh."
          echo "You may want to see who owns that configuration file with:"
-         echo "'ls /opt/jellyfin/config/jellyfin.conf'"
+         echo "'ls -l /opt/jellyfin/config/jellyfin.conf'"
          sleep 5
          read -p "...Continue with $defaultUser? [yes/No] :" newUserOrOld
          if [[ $newUserOrOld == [yY][eE][sS] ]]; then
@@ -60,6 +60,12 @@ Import()
             read -p "No? Which user should own /opt/jellyfin?: " defaultUser
             echo "Well... I should've known $defaultUser would be the one..."
             sleep 1
+            read -p "Please enter the default user for Jellyfin: " defaultUser
+	    while id "$defaultUser" &>/dev/null; do
+	        echo "Cannot create $defaultUser as $defaultUser already exists..."
+	        read -p "Please re-enter a new default user for Jellyfin: " defaultUser
+	    done
+	    adduser -rd /opt/jellyfin $defaultUser
             chown -Rfv $defaultUser:$defaultUser /opt/jellyfin
             chmod -Rfv 770 /opt/jellyfin
             jellyfin -s -t
@@ -77,7 +83,7 @@ if [ -n "$1" ]; then
    exit
 fi
 
-echo "Fetching newest Jellyfin version..."
+echo "Fetching newest stable Jellyfin version..."
 wget https://repo.jellyfin.org/releases/server/linux/stable/combined/
 jellyfin_archive=$(grep 'amd64.tar.gz"' index.html | cut -d '"' -f 2)
 rm index.html
@@ -107,13 +113,13 @@ ln -s $jellyfin jellyfin
 mkdir data cache config log
 touch config/jellyfin.conf
 echo "defaultPath=" >> config/jellyfin.conf
+echo "currentVersion=$jellyfin" >> config/jellyfin.conf
 echo "defaultUser=$defaultUser" >> config/jellyfin.conf
 
 echo "Preparing to install needed dependancies for Jellyfin..."
 echo
-echo Please enter root password to install dependancies....
 
-packagesNeeded='ffmpeg ffmpeg-devel ffmpeg-libs'
+packagesNeeded='ffmpeg ffmpeg-devel ffmpeg-libs git'
 if [ -x "$(command -v apt)" ]; then
 	apt install $packagesNeeded
 elif [ -x "$(command -v dnf)" ]; then 
