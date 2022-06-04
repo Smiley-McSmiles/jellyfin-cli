@@ -18,7 +18,7 @@
 * **Status** - Get status information on jellyfin.service.
 * **Backup** - Input a directroy to output the backup archive.
 * **Import** - Import a .tar file to pick up where you left off on another system.
-* **Get Version** - Get the current version of Jellyfin.
+* **Get Version** - Get the current installed version of Jellyfin.
 * **Uninstall** - Uninstalls Jellyfin completely (Ignores the Media Directory).
 
 ### Getting Started
