@@ -52,6 +52,7 @@ Check_Version()
 
 Get_version()
 {
+   Has_sudo
    source /opt/jellyfin/config/jellyfin.conf
    echo "$currentVersion"
 }
