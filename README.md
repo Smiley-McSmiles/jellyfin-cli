@@ -36,7 +36,7 @@ sudo ./setup.sh
 jellyfin - The CLI Tool
 -Created by Smiley McSmiles
 
-Syntax: jellyfin -[b|d|e|h|i|p|r|s|S|u|U|-ub|X] [OPTIONS]
+Syntax: jellyfin -[b|d|e|h|i|p|r|s|S|u|U|ub|v|X] [OPTIONS]
 options:
 -b     [DIRECTORY] Input directory to output backup archive
 -d     Disable Jellyfin on System Start
