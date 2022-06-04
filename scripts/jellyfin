@@ -63,7 +63,7 @@ Help()
    echo "jellyfin - The CLI Tool"
    echo "-Created by Smiley McSmiles"
    echo 
-   echo "Syntax: jellyfin -[b|d|e|h|i|p|r|s|S|u|U|-ub|X] [OPTIONS]"
+   echo "Syntax: jellyfin -[b|d|e|h|i|p|r|s|S|u|U|ub|v|X] [OPTIONS]"
    echo "options:"
    echo "-b     [DIRECTORY] Input directory to output backup archive"
    echo "-d     Disable Jellyfin on System Start"
@@ -265,7 +265,7 @@ Has_sudo()
    else
       has_sudo_access="NO"
 	   echo "$USER, you're not using sudo..."
-      echo "Please use 'sudo jellyfin [b|d|e|h|p|r|s|S|u|X] [OPTIONS]'"
+      echo "Please use 'sudo jellyfin -[b|d|e|h|i|p|r|s|S|u|U|ub|v|X] [OPTIONS]'"
 	   exit
    fi
 }
