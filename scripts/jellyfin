@@ -89,7 +89,7 @@ Version_switch()
       unlink /opt/jellyfin/jellyfin
       ln -s /opt/jellyfin/$newVersion /opt/jellyfin/jellyfin
       chown -Rfv $defaultUser:$defaultUser /opt/jellyfin/jellyfin
-      jellyfin 
+      jellyfin -s
    fi
 }
 
