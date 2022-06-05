@@ -1,7 +1,7 @@
 ![jellyfin-cli](.github/banner-light.png?raw=true "Jellyfin Logo")
 ======
 
-> v-1.3 Distributed CLI tool for Jellyfin tar.gz installer
+> v-1.3.1 Distributed CLI tool for Jellyfin tar.gz installer
 > Tested on Fedora 34 & Fedora 35
 
 ### Features
@@ -19,6 +19,7 @@
 * **Backup** - Input a directroy to output the backup archive.
 * **Import** - Import a .tar file to pick up where you left off on another system.
 * **Get Version** - Get the current installed version of Jellyfin.
+* **Version Switch** - Switch Jellyfin version for another previously installed version.
 * **Uninstall** - Uninstalls Jellyfin completely (Ignores the Media Directory).
 
 ### Getting Started
@@ -36,7 +37,7 @@ sudo ./setup.sh
 jellyfin - The CLI Tool
 -Created by Smiley McSmiles
 
-Syntax: jellyfin -[b|d|e|h|i|p|r|s|S|u|U|ub|v|X] [OPTIONS]
+Syntax: jellyfin -[b|d|e|h|i|p|r|s|S|u|U|ub|v|vs|X] [OPTIONS]
 options:
 -b     [DIRECTORY] Input directory to output backup archive
 -d     Disable Jellyfin on System Start
@@ -52,6 +53,7 @@ options:
 -U     Update Jellyfin - The CLI Tool
 -ub    Update Jellyfin to the most recent Beta
 -v     Get the current version of Jellyfin.
+-vs    Switch Jellyfin version for another previously installed version.
 -X     Uninstall Jellyfin Completely
 ```
 

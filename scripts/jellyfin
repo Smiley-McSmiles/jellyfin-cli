@@ -50,11 +50,41 @@ Check_Version()
    fi
 }
 
+Check_disk_free()
+{
+   if [[ $defaultPath != /* ]]; then 
+	   echo "No default directory found..."
+	   echo "Please enter the root directory for your Media Library..."
+	   read defaultPath
+	   sed -i -e "s|defaultPath=|defaultPath=$defaultPath|g" /opt/jellyfin/config/jellyfin.conf
+	   df -h $defaultPath
+   else 
+	   df -h $defaultPath
+   fi
+}
+
 Get_version()
 {
    Has_sudo
    source /opt/jellyfin/config/jellyfin.conf
    echo "$currentVersion"
+}
+
+Version_switch()
+{
+   echo "Current Jellyfin version installed"
+   Get_version
+   echo ""
+   echo "Jellyfin versions available:"
+   ls /opt/jellyfin/ | grep "_" | cat -n
+   echo ""
+   echo "Please enter the number corresponding with"
+   read -p "the version you want to install :" newVersionNumber
+   newVersion=$(ls /opt/jellyfin/ | grep "_" | head -n $newVersionNumber | tail -n 1)
+   unlink /opt/jellyfin/jellyfin
+   ln -s /opt/jellyfin/$newVersion /opt/jellyfin/jellyfin
+   chown -Rfv $defaultUser:$defaultUser /opt/jellyfin/jellyfin
+   
 }
 
 Help()
@@ -63,7 +93,7 @@ Help()
    echo "jellyfin - The CLI Tool"
    echo "-Created by Smiley McSmiles"
    echo 
-   echo "Syntax: jellyfin -[b|d|e|h|i|p|r|s|S|u|U|ub|v|X] [OPTIONS]"
+   echo "Syntax: jellyfin -[b|d|e|h|i|p|r|s|S|u|U|ub|v|vs|X] [OPTIONS]"
    echo "options:"
    echo "-b     [DIRECTORY] Input directory to output backup archive"
    echo "-d     Disable Jellyfin on System Start"
@@ -79,6 +109,7 @@ Help()
    echo "-U     Update Jellyfin - The CLI Tool"
    echo "-ub    Update Jellyfin to the most recent Beta"
    echo "-v     Get the current installed version of Jellyfin"
+   echo "-vs    Switch Jellyfin version for another previously installed version."
    echo "-X     Uninstall Jellyfin Completely"
    echo
 }
@@ -152,7 +183,7 @@ Permissions()
 	   sed -i -e "s|defaultPath=|defaultPath=$defaultPath|g" /opt/jellyfin/config/jellyfin.conf
    else 
 	   echo "defaultPath is set to $defaultPath";
-	fi
+   fi
    #Check if there is a recorded user/group for chown and chmod:
    if id "$defaultUser" &>/dev/null; then
 	   echo "defaultUser is set to $defaultUser"
@@ -293,11 +324,12 @@ if [ -n "$1" ]; then
          -r) systemctl restart jellyfin.service ;;
          -s) systemctl start jellyfin.service ;;
          -S) systemctl stop jellyfin.service ;;
-         -t) systemctl status jellyfin.service ;;
+         -t) systemctl status jellyfin.service && Check_disk_free ;;
          -u) Update ;;
          -U) Update-cli ;;
 	 -ub) Update_beta ;;
 	 -v) Get_version ;;
+	 -vs) Version_switch ;;
          -X) Uninstall ;;
          *) echo "Option $1 not recognized" 
             Help ;;
