@@ -334,7 +334,7 @@ if [ -n "$1" ]; then
          -t) systemctl status jellyfin.service && Check_disk_free ;;
          -u) Update ;;
          -U) Update-cli ;;
-	 -ub) Update_beta ;;
+         -ub) Update_beta ;;
 	 -v) Get_version ;;
 	 -vs) Version_switch ;;
          -X) Uninstall ;;
