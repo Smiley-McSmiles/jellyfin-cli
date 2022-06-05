@@ -81,10 +81,14 @@ Version_switch()
    echo "Please enter the number corresponding with"
    read -p "the version you want to install :" newVersionNumber
    newVersion=$(ls /opt/jellyfin/ | grep "_" | head -n $newVersionNumber | tail -n 1)
-   unlink /opt/jellyfin/jellyfin
-   ln -s /opt/jellyfin/$newVersion /opt/jellyfin/jellyfin
-   chown -Rfv $defaultUser:$defaultUser /opt/jellyfin/jellyfin
-   
+   if [$newVersion = ""]; then
+      echo "The new version you chose doesn't exist, please run this command again and pick a listed number"
+      exit
+   else
+      unlink /opt/jellyfin/jellyfin
+      ln -s /opt/jellyfin/$newVersion /opt/jellyfin/jellyfin
+      chown -Rfv $defaultUser:$defaultUser /opt/jellyfin/jellyfin
+   fi
 }
 
 Help()
