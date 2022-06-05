@@ -41,7 +41,7 @@ Backup()
 Check_Version()
 {
    source /opt/jellyfin/config/jellyfin.conf
-   if [ $jellyfin == $currentVersion ];then
+   if [[ $jellyfin == $currentVersion ]];then
       echo "The installed version of Jellyfin matches the newest version available."
       echo "$currentVersion"
       exit
@@ -79,15 +79,17 @@ Version_switch()
    ls /opt/jellyfin/ | grep "_" | cat -n
    echo ""
    echo "Please enter the number corresponding with"
-   read -p "the version you want to install :" newVersionNumber
+   read -p "the version you want to install : " newVersionNumber
    newVersion=$(ls /opt/jellyfin/ | grep "_" | head -n $newVersionNumber | tail -n 1)
    if [$newVersion = ""]; then
       echo "The new version you chose doesn't exist, please run this command again and pick a listed number"
       exit
    else
+      jellyfin -S
       unlink /opt/jellyfin/jellyfin
       ln -s /opt/jellyfin/$newVersion /opt/jellyfin/jellyfin
       chown -Rfv $defaultUser:$defaultUser /opt/jellyfin/jellyfin
+      jellyfin 
    fi
 }
 
