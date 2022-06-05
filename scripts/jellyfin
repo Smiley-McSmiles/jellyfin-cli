@@ -52,6 +52,7 @@ Check_Version()
 
 Check_disk_free()
 {
+   source /opt/jellyfin/config/jellyfin.conf
    if [[ $defaultPath != /* ]]; then 
 	   echo "No default directory found..."
 	   echo "Please enter the root directory for your Media Library..."
