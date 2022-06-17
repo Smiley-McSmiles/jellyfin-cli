@@ -91,6 +91,7 @@ Version_switch()
       unlink /opt/jellyfin/jellyfin
       ln -s /opt/jellyfin/$newVersion /opt/jellyfin/jellyfin
       chown -Rfv $defaultUser:$defaultUser /opt/jellyfin/jellyfin
+      sed -i -e "s|currentVersion=.*|currentVersion=$newVersion|g" /opt/jellyfin/config/jellyfin.conf
       jellyfin -s
    fi
 }
