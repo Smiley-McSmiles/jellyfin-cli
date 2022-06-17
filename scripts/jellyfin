@@ -57,7 +57,7 @@ Check_disk_free()
 	   echo "No default directory found..."
 	   echo "Please enter the root directory for your Media Library..."
 	   read defaultPath
-	   sed -i -e "s|defaultPath=|defaultPath=$defaultPath|g" /opt/jellyfin/config/jellyfin.conf
+	   sed -i -e "s|defaultPath=.*|defaultPath=$defaultPath|g" /opt/jellyfin/config/jellyfin.conf
 	   df -h $defaultPath
    else 
 	   df -h $defaultPath
@@ -188,7 +188,7 @@ Permissions()
 	   echo "No default directory found..."
 	   echo "Please enter the root directory for your Media Library..."
 	   read defaultPath
-	   sed -i -e "s|defaultPath=|defaultPath=$defaultPath|g" /opt/jellyfin/config/jellyfin.conf
+	   sed -i -e "s|defaultPath=.*|defaultPath=$defaultPath|g" /opt/jellyfin/config/jellyfin.conf
    else 
 	   echo "defaultPath is set to $defaultPath";
    fi
@@ -199,7 +199,7 @@ Permissions()
 	   echo "No default user found..."
 	   echo "Please enter the owner for this directory..."
 	   read defaultUser
-	   sed -i -e "s|defaultUser=|defaultUser=$defaultUser|g" /opt/jellyfin/config/jellyfin.conf
+	   sed -i -e "s|defaultUser=.*|defaultUser=$defaultUser|g" /opt/jellyfin/config/jellyfin.conf
    fi
 
    chown -Rfv $defaultUser:$defaultUser $defaultPath
@@ -230,7 +230,7 @@ Update()
 
    chown -R $defaultUser:$defaultUser /opt/jellyfin
    echo "Jellyfin updated to version $new_jellyfin_version"
-   sed -i -e "s|currentVersion=|currentVersion=$jellyfin|g" /opt/jellyfin/config/jellyfin.conf
+   sed -i -e "s|currentVersion=.*|currentVersion=$jellyfin|g" /opt/jellyfin/config/jellyfin.conf
    jellyfin -s -t
 }
 
@@ -259,7 +259,7 @@ Update_beta()
 
    chown -R $defaultUser:$defaultUser /opt/jellyfin
    echo "Jellyfin updated to version $new_jellyfin_version"
-   sed -i -e "s|currentVersion=|currentVersion=$jellyfin|g" /opt/jellyfin/config/jellyfin.conf
+   sed -i -e "s|currentVersion=.*|currentVersion=$jellyfin|g" /opt/jellyfin/config/jellyfin.conf
    jellyfin -s -t
 }
 
