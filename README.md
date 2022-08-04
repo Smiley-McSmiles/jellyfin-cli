@@ -45,7 +45,7 @@ options:
 -e     Enable Jellyfin on System Start
 -h     Print this Help
 -i     [FILE.tar] Input file to Import jellyfin-backup.tar
--p     Reset the permissions of Jellyfin's Media Library
+-p     Reset the permissions of Jellyfins Media Library
 -r     Restart Jellyfin
 -s     Start Jellyfin
 -S     Stop Jellyfin
