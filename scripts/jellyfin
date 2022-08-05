@@ -335,7 +335,7 @@ if [ -n "$1" ]; then
          -r) systemctl restart jellyfin.service ;;
          -s) systemctl start jellyfin.service ;;
          -S) systemctl stop jellyfin.service ;;
-         -t) clear && Check_disk_free && systemctl status jellyfin.service ;;
+         -t) clear && Check_disk_free && echo "" && echo "" && systemctl status jellyfin.service ;;
          -u) Update ;;
          -U) Update-cli ;;
          -ub) Update_beta ;;
