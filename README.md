@@ -1,9 +1,10 @@
 ![jellyfin-cli](.github/banner-light.png?raw=true "Jellyfin Logo")
 ======
 
-> v-1.3.4 CLI tool for Jellyfin tar.gz installer
+> v-1.3.5 CLI tool for Jellyfin tar.gz installer
 
 > Tested on Fedora 34/35/36, Ubuntu 22.04, Manjaro 21.3.6
+> Should work on Any Debian, Arch, or RHEL Based Distro, and OpenSuse
 
 ### Features
 

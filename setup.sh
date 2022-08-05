@@ -72,6 +72,8 @@ Import()
 	    adduser -rd /opt/jellyfin $defaultUser
             elif [ -x "$(command -v pacman)" ]; then 
 	    useradd -rd /opt/jellyfin $defaultUser
+            elif [ -x "$(command -v zypper)" ]; then 
+	    useradd -rd /opt/jellyfin $defaultUser
             fi
 	    
             chown -Rfv $defaultUser:$defaultUser /opt/jellyfin
@@ -112,6 +114,9 @@ elif [ -x "$(command -v dnf)" ]; then
 adduser -rd /opt/jellyfin $defaultUser
 elif [ -x "$(command -v pacman)" ]; then 
 useradd -rd /opt/jellyfin $defaultUser
+elif [ -x "$(command -v zypper)" ]; then 
+useradd -rd /opt/jellyfin $defaultUser
+
 fi
 
 mkdir /opt/jellyfin/old /opt/jellyfin/backup
@@ -122,6 +127,8 @@ elif [ -x "$(command -v dnf)" ]; then
 cp jellyfin.1 /usr/local/share/man/man1/
 elif [ -x "$(command -v pacman)" ]; then 
 cp jellyfin.1 /usr/share/man/man1/
+elif [ -x "$(command -v zypper)" ]; then 
+cp jellyfin.1 /usr/local/share/man/man1/
 fi
 
 cp scripts/jellyfin /bin/
@@ -144,6 +151,7 @@ echo
 packagesNeededDebian='ffmpeg git net-tools'
 packagesNeededFedora='ffmpeg ffmpeg-devel ffmpeg-libs git'
 packagesNeededArch='ffmpeg git'
+packagesNeededOpenSuse='ffmpeg-4 git'
 if [ -x "$(command -v apt)" ]; then
         add-apt-repository universe -y
         apt update -y
@@ -153,6 +161,8 @@ elif [ -x "$(command -v dnf)" ]; then
 	dnf install $packagesNeededFedora -y
 elif [ -x "$(command -v pacman)" ]; then
     pacman -Syu $packagesNeededArch
+elif [ -x "$(command -v zypper)" ]; then
+    zypper install $packagesNeededOpenSuse
 else 
 	echo "FAILED TO INSTALL PACKAGES: Package manager not found. You must manually install: ffmpeg and git";
 fi
