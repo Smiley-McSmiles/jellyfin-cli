@@ -275,10 +275,12 @@ Uninstall()
    read -p "CONTINUE?: [yes/No]" toUninstallOrNotToUninstall
    if [[ $toUninstallOrNotToUninstall == [yY][eE][sS] ]]; then
       echo "Goodbye..."
-      sleey 1
+      sleep 1
+      source /opt/jellyfin/config/jellyfin.conf
       rm -rfv /opt/jellyfin
       rm -fv /etc/jellyfin.conf
-      rm -fv /bin/jellyfin 
+      rm -fv /bin/jellyfin
+      userdel -f $defaultUser
    else
       echo "Phew! That was a close one!"
    fi

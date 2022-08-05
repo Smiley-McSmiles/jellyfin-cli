@@ -65,7 +65,13 @@ Import()
 	        echo "Cannot create $defaultUser as $defaultUser already exists..."
 	        read -p "Please re-enter a new default user for Jellyfin: " defaultUser
 	    done
+	    
+            if [ -x "$(command -v apt)" ]; then
+	    adduser --system --group --home /opt/jellyfin $defaultUser
+            elif [ -x "$(command -v dnf)" ]; then 
 	    adduser -rd /opt/jellyfin $defaultUser
+            fi
+	    
             chown -Rfv $defaultUser:$defaultUser /opt/jellyfin
             chmod -Rfv 770 /opt/jellyfin
             jellyfin -s -t
@@ -98,10 +104,20 @@ while id "$defaultUser" &>/dev/null; do
    echo "Cannot create $defaultUser as $defaultUser already exists..."
    read -p "Please re-enter a new default user for Jellyfin: " defaultUser
 done
+if [ -x "$(command -v apt)" ]; then
+adduser --system --group --home /opt/jellyfin $defaultUser
+elif [ -x "$(command -v dnf)" ]; then 
 adduser -rd /opt/jellyfin $defaultUser
+fi
 
 mkdir /opt/jellyfin/old /opt/jellyfin/backup
+
+if [ -x "$(command -v apt)" ]; then
+cp jellyfin.1 /usr/share/man/man1/
+elif [ -x "$(command -v dnf)" ]; then 
 cp jellyfin.1 /usr/local/share/man/man1/
+fi
+
 cp scripts/jellyfin /bin/
 cp scripts/jellyfin.sh /opt/jellyfin/
 cp $jellyfin_archive /opt/jellyfin/
@@ -119,12 +135,15 @@ echo "defaultUser=$defaultUser" >> config/jellyfin.conf
 echo "Preparing to install needed dependancies for Jellyfin..."
 echo
 
-packagesNeeded='ffmpeg ffmpeg-devel ffmpeg-libs git'
+packagesNeededDebian='ffmpeg git net-tools'
+packagesNeededFedora='ffmpeg ffmpeg-devel ffmpeg-libs git'
 if [ -x "$(command -v apt)" ]; then
-	apt install $packagesNeeded
+        add-apt-repository universe -y
+        apt update -y
+        apt install $packagesNeededDebian -y
 elif [ -x "$(command -v dnf)" ]; then 
 	dnf install https://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm https://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm
-	dnf install $packagesNeeded
+	dnf install $packagesNeededFedora -y
 else 
 	echo "FAILED TO INSTALL PACKAGES: Package manager not found. You must manually install: ffmpeg";
 fi
@@ -137,6 +156,7 @@ chmod +x /bin/jellyfin
 echo "Unblocking port 8096..."
 if [ -x "$(command -v ufw)" ]; then
 	ufw allow 8096
+	ufw reload
 elif [ -x "$(command -v firewall-cmd)" ]; then 
 	firewall-cmd --permanent --zone=public --add-port=8096/tcp
 	firewall-cmd --permanent --zone=public --add-port=8096/udp
