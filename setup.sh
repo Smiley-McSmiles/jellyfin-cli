@@ -70,6 +70,8 @@ Import()
 	    adduser --system --group --home /opt/jellyfin $defaultUser
             elif [ -x "$(command -v dnf)" ]; then 
 	    adduser -rd /opt/jellyfin $defaultUser
+            elif [ -x "$(command -v pacman)" ]; then 
+	    useradd -rd /opt/jellyfin $defaultUser
             fi
 	    
             chown -Rfv $defaultUser:$defaultUser /opt/jellyfin
@@ -108,6 +110,8 @@ if [ -x "$(command -v apt)" ]; then
 adduser --system --group --home /opt/jellyfin $defaultUser
 elif [ -x "$(command -v dnf)" ]; then 
 adduser -rd /opt/jellyfin $defaultUser
+elif [ -x "$(command -v pacman)" ]; then 
+useradd -rd /opt/jellyfin $defaultUser
 fi
 
 mkdir /opt/jellyfin/old /opt/jellyfin/backup
@@ -116,6 +120,8 @@ if [ -x "$(command -v apt)" ]; then
 cp jellyfin.1 /usr/share/man/man1/
 elif [ -x "$(command -v dnf)" ]; then 
 cp jellyfin.1 /usr/local/share/man/man1/
+elif [ -x "$(command -v pacman)" ]; then 
+cp jellyfin.1 /usr/share/man/man1/
 fi
 
 cp scripts/jellyfin /bin/
@@ -137,6 +143,7 @@ echo
 
 packagesNeededDebian='ffmpeg git net-tools'
 packagesNeededFedora='ffmpeg ffmpeg-devel ffmpeg-libs git'
+packagesNeededArch='ffmpeg git'
 if [ -x "$(command -v apt)" ]; then
         add-apt-repository universe -y
         apt update -y
@@ -144,8 +151,10 @@ if [ -x "$(command -v apt)" ]; then
 elif [ -x "$(command -v dnf)" ]; then 
 	dnf install https://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm https://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm
 	dnf install $packagesNeededFedora -y
+elif [ -x "$(command -v pacman)" ]; then
+    pacman -Syu $packagesNeededArch
 else 
-	echo "FAILED TO INSTALL PACKAGES: Package manager not found. You must manually install: ffmpeg";
+	echo "FAILED TO INSTALL PACKAGES: Package manager not found. You must manually install: ffmpeg and git";
 fi
 
 echo "Setting Permissions for Jellyfin..."
@@ -176,10 +185,8 @@ echo
 echo
 echo "DONE"
 echo
-echo "Navigate to https://localhost:8096/ in your Web Browser to claim your"
+echo "Navigate to http://localhost:8096/ in your Web Browser to claim your"
 echo "Jellyfin server"
 echo
-echo "To manage Jellyfin use 'sudo systemctl start|stop|restart|enable|disable jellyfin'"
-echo "or see 'jellyfin -h'"
-echo
-echo "To update Jellyfin, use 'sudo jellyfin -u'"
+echo "To manage Jellyfin use 'jellyfin -h'"
+jellyfin -h
