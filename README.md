@@ -1,7 +1,7 @@
 ![jellyfin-cli](.github/banner-light.png?raw=true "Jellyfin Logo")
 ======
 
-> v-1.3.5 CLI tool for Jellyfin tar.gz installer
+> v-1.3.6 CLI tool for Jellyfin tar.gz installer
 
 > Tested on Fedora 34/35/36, Ubuntu 22.04, Manjaro 21.3.6
 
@@ -10,7 +10,7 @@
 ### Features
 
 * **Setup** - Sets up the initial install.
-* **Update** - Downloads and updates the current Jellyfin version.
+* **Update** - [URL - optional] Downloads and updates the current stable or supplied Jellyfin version.
 * **Update-cli** - Updates this Jellyfin CLI Tool.
 * **Update Beta** Downloads and updates to the current Jellyfin Beta version.
 * **Disable** - Disable the jellyfin.service.
@@ -52,7 +52,7 @@ options:
 -s     Start Jellyfin
 -S     Stop Jellyfin
 -t     Status of Jellyfin
--u     Update Jellyfin
+-u     [URL - optional] Downloads and updates the current stable or supplied Jellyfin version.
 -U     Update Jellyfin - The CLI Tool
 -ub    Update Jellyfin to the most recent Beta
 -v     Get the current version of Jellyfin.

@@ -76,7 +76,7 @@ Version_switch()
    echo "Current Jellyfin version installed"
    Get_version
    echo ""
-   echo "Jellyfin versions available:"
+   echo "Jellyfin versions already downloaded:"
    ls /opt/jellyfin/ | grep "_" | cat -n
    echo ""
    echo "Please enter the number corresponding with"
@@ -100,6 +100,7 @@ Help()
 {
    # Display Help
    echo "jellyfin - The CLI Tool"
+   echo "Version 1.3.6"
    echo "-Created by Smiley McSmiles"
    echo 
    echo "Syntax: jellyfin -[b|d|e|h|i|p|r|s|S|u|U|ub|v|vs|X] [OPTIONS]"
@@ -114,7 +115,7 @@ Help()
    echo "-s     Start Jellyfin"
    echo "-S     Stop Jellyfin"
    echo "-t     Status of Jellyfin"
-   echo "-u     Update Jellyfin"
+   echo "-u     [URL - optional] Downloads and updates the current stable or supplied Jellyfin version."
    echo "-U     Update Jellyfin - The CLI Tool"
    echo "-ub    Update Jellyfin to the most recent Beta"
    echo "-v     Get the current installed version of Jellyfin"
@@ -209,7 +210,25 @@ Permissions()
 
 Update()
 {
+   customVersionLink=$1
    Has_sudo
+   if [[ $customVersionLink != "" ]]; then 
+   echo "Fetching custom Jellyfin version..."
+   customVersion=$(echo $customVersionLink | rev | cut -d/ -f1 | rev)
+   
+   fileType=$(echo $customVersion | cut -d_ -f3)
+   if [[ $fileType != "amd64.tar.gz" ]]; then
+   echo "Supplied URL does not point to a amd64.tar.gz.. EXITING..."
+   exit
+   fi
+   
+   mkdir /opt/jellyfin/update
+   wget -P /opt/jellyfin/update/ $customVersionLink
+   jellyfin_archive=$customVersion
+   jellyfin=$(echo $jellyfin_archive | sed -r 's/_amd64.tar.gz//g')
+   new_jellyfin_version=$(echo $jellyfin | sed -r 's/jellyfin_//g')   
+   
+   else
    echo "Fetching newest Jellyfin version..."
    mkdir /opt/jellyfin/update
    wget -O /opt/jellyfin/update/index.html https://repo.jellyfin.org/releases/server/linux/stable/combined/
@@ -219,14 +238,14 @@ Update()
    rm -f /opt/jellyfin/update/index.html
    Check_Version
    wget -O /opt/jellyfin/update/$jellyfin_archive https://repo.jellyfin.org/releases/server/linux/stable/combined/$jellyfin_archive
-
+   fi
+   
    echo "Unpacking $jellyfin_archive to /opt/jellyfin/..."
    tar xvzf /opt/jellyfin/update/$jellyfin_archive -C /opt/jellyfin/
    jellyfin -S
    unlink /opt/jellyfin/jellyfin
    ln -s /opt/jellyfin/$jellyfin /opt/jellyfin/jellyfin
-   echo "moving $jellyfin_archive to /opt/jellyfin/old/$jellyfin_archive"
-   mv -v /opt/jellyfin/update/$jellyfin_archive /opt/jellyfin/old/
+   echo "Removing $jellyfin_archive"
    rm -rfv /opt/jellyfin/update
 
    chown -R $defaultUser:$defaultUser /opt/jellyfin
@@ -239,7 +258,7 @@ Update()
 Update_beta()
 {
    Has_sudo
-   echo "Fetching newest Jellyfin version..."
+   echo "Fetching newest beta Jellyfin version..."
    mkdir /opt/jellyfin/update
    wget -O /opt/jellyfin/update/index.html https://repo.jellyfin.org/releases/server/linux/stable-pre/
    jellyfin_archive=$(grep 'amd64.tar.gz' /opt/jellyfin/update/index.html | grep 'combined' | cut -d '/' -f5 | cut -d '<' -f1 | head -n 1)
@@ -254,8 +273,7 @@ Update_beta()
    jellyfin -S
    unlink /opt/jellyfin/jellyfin
    ln -s /opt/jellyfin/$jellyfin /opt/jellyfin/jellyfin
-   echo "moving $jellyfin_archive to /opt/jellyfin/old/$jellyfin_archive"
-   mv -v /opt/jellyfin/update/$jellyfin_archive /opt/jellyfin/old/
+   echo "Removing $jellyfin_archive"
    rm -rfv /opt/jellyfin/update
 
    chown -R $defaultUser:$defaultUser /opt/jellyfin
@@ -336,7 +354,8 @@ if [ -n "$1" ]; then
          -s) systemctl start jellyfin.service ;;
          -S) systemctl stop jellyfin.service ;;
          -t) clear && Check_disk_free && echo "" && echo "" && systemctl status jellyfin.service ;;
-         -u) Update ;;
+         -u) Update $2
+             shift;;
          -U) Update-cli ;;
          -ub) Update_beta ;;
 	 -v) Get_version ;;
