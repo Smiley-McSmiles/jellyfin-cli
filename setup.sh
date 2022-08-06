@@ -66,15 +66,7 @@ Import()
 	        read -p "Please re-enter a new default user for Jellyfin: " defaultUser
 	    done
 	    
-            if [ -x "$(command -v apt)" ]; then
-	    adduser --system --group --home /opt/jellyfin $defaultUser
-            elif [ -x "$(command -v dnf)" ]; then 
-	    adduser -rd /opt/jellyfin $defaultUser
-            elif [ -x "$(command -v pacman)" ]; then 
-	    useradd -rd /opt/jellyfin $defaultUser
-            elif [ -x "$(command -v zypper)" ]; then 
-	    useradd -rd /opt/jellyfin $defaultUser
-            fi
+            useradd -rd /opt/jellyfin $defaultUser
 	    
             chown -Rfv $defaultUser:$defaultUser /opt/jellyfin
             chmod -Rfv 770 /opt/jellyfin
@@ -108,16 +100,8 @@ while id "$defaultUser" &>/dev/null; do
    echo "Cannot create $defaultUser as $defaultUser already exists..."
    read -p "Please re-enter a new default user for Jellyfin: " defaultUser
 done
-if [ -x "$(command -v apt)" ]; then
-adduser --system --group --home /opt/jellyfin $defaultUser
-elif [ -x "$(command -v dnf)" ]; then 
-adduser -rd /opt/jellyfin $defaultUser
-elif [ -x "$(command -v pacman)" ]; then 
-useradd -rd /opt/jellyfin $defaultUser
-elif [ -x "$(command -v zypper)" ]; then 
-useradd -rd /opt/jellyfin $defaultUser
 
-fi
+useradd -rd /opt/jellyfin $defaultUser
 
 mkdir /opt/jellyfin/old /opt/jellyfin/backup
 
@@ -199,4 +183,5 @@ echo "Navigate to http://localhost:8096/ in your Web Browser to claim your"
 echo "Jellyfin server"
 echo
 echo "To manage Jellyfin use 'jellyfin -h'"
+echo
 jellyfin -h
