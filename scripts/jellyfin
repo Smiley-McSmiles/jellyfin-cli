@@ -122,6 +122,8 @@ Help()
    echo "-vs    Switch Jellyfin version for another previously installed version."
    echo "-X     Uninstall Jellyfin Completely"
    echo
+   echo "To browse Jellyfin versions please use this link."
+   echo https://repo.jellyfin.org/releases/server/linux/versions/
 }
 
 Import()
