@@ -19,9 +19,9 @@ is a set of scripts to install and update the jellyfin-combined tar.gz
 
 .SH USAGE
 .B SYNTAX
-- jellyfin -[b|d|e|h|i|p|r|s|S|u|U|ub|v|vs|X] [OPTIONS]
+- jellyfin -[COMMAND] [PARAMETER]
 .TP
-.SS OPTIONS
+.SS COMMANDS
 .TP
 .B -b     [DIRECTORY] Input directory to output backup archive
 .TP
@@ -56,6 +56,12 @@ is a set of scripts to install and update the jellyfin-combined tar.gz
 .B -rv    Remove a Jellyfin version
 .TP
 .B -X     Uninstall Jellyfin Completely
+
+.SH EXAMPLE
+.TP
+.B To stop jellyfin, disable on startup, backup, and then start the jellyfin server:
+.TP
+.B 'sudo jellyfin -S -d -b /home/$USER/ -s'
 
 .SH FILES
 .TP
