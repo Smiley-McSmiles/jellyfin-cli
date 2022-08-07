@@ -41,8 +41,9 @@ sudo ./setup.sh
 jellyfin - The CLI Tool
 -Created by Smiley McSmiles
 
-Syntax: jellyfin -[b|d|e|h|i|p|r|s|S|u|U|ub|v|vs|X] [OPTIONS]
-options:
+Syntax: jellyfin -[COMMAND] [PARAMETER]
+
+COMMANDS:
 -b     [DIRECTORY] Input directory to output backup archive
 -d     Disable Jellyfin on System Start
 -e     Enable Jellyfin on System Start
@@ -60,6 +61,10 @@ options:
 -vs    Switch Jellyfin version for another previously installed version.
 -rv    Remove a Jellyfin version
 -X     Uninstall Jellyfin Completely
+
+EXAMPLE:
+-To stop jellyfin, disable on startup, backup, and then start the jellyfin server:
+'sudo jellyfin -S -d -b /home/$USER/ -s'
 ```
 
 ### License
