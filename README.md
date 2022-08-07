@@ -1,7 +1,7 @@
 ![jellyfin-cli](.github/banner-shadow.png?raw=true "Jellyfin Logo")
 ======
 
-> v-1.3.7 CLI companion tool for the Jellyfin amd64.tar.gz package
+> v1.4.0 CLI companion tool for the Jellyfin amd64.tar.gz package
 
 > Tested on Fedora 34/35/36, Ubuntu 22.04, Manjaro 21.3.6
 
@@ -24,6 +24,7 @@
 * **Get Version** - Get the current installed version of Jellyfin.
 * **Remove Version** - Remove a specific version of Jellyfin
 * **Version Switch** - Switch Jellyfin version for another previously installed version.
+* **Rename TV** - Batch renaming script for TV shows.
 * **Uninstall** - Uninstalls Jellyfin completely (Ignores the Media Directory).
 
 ### Getting Started
@@ -44,23 +45,24 @@ jellyfin - The CLI Tool
 Syntax: jellyfin -[COMMAND] [PARAMETER]
 
 COMMANDS:
--b     [DIRECTORY] Input directory to output backup archive
--d     Disable Jellyfin on System Start
--e     Enable Jellyfin on System Start
--h     Print this Help
--i     [FILE.tar] Input file to Import jellyfin-backup.tar
--p     Reset the permissions of Jellyfins Media Library
--r     Restart Jellyfin
--s     Start Jellyfin
--S     Stop Jellyfin
--t     Status of Jellyfin
+-b     [DIRECTORY] Input directory to output backup archive.
+-d     Disable Jellyfin on System Start.
+-e     Enable Jellyfin on System Start.
+-h     Print this Help.
+-i     [FILE.tar] Input file to Import jellyfin-backup.tar.
+-p     Reset the permissions of Jellyfins Media Library.
+-r     Restart Jellyfin.
+-s     Start Jellyfin.
+-S     Stop Jellyfin.
+-t     Status of Jellyfin.
 -u     [URL - optional] Downloads and updates the current stable or supplied Jellyfin version.
--U     Update Jellyfin - The CLI Tool
--ub    Update Jellyfin to the most recent Beta
+-U     Update Jellyfin - The CLI Tool.
+-ub    Update Jellyfin to the most recent Beta.
 -v     Get the current version of Jellyfin.
 -vs    Switch Jellyfin version for another previously installed version.
--rv    Remove a Jellyfin version
--X     Uninstall Jellyfin Completely
+-rv    Remove a Jellyfin version.
+-rn    Batch renaming script for TV shows.
+-X     Uninstall Jellyfin Completely.
 
 EXAMPLE:
 -To stop jellyfin, disable on startup, backup, and then start the jellyfin server:

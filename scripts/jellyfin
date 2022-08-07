@@ -83,9 +83,12 @@ Version_switch()
    read -p "the version you want to install : " newVersionNumber
    newVersion=$(ls /opt/jellyfin/ | grep "_" | head -n $newVersionNumber | tail -n 1)
    maxNumber=$(ls /opt/jellyfin/ | grep "_" | wc -l)
-   if (( $newVersionNumber > $maxNumber )); then
+   if (( $versionToRemoveNumber > $maxNumber )); then
+     echo "The new version you chose doesn't exist, please run this command again and pick a listed number"
+     exit
+   elif (( $versionToRemoveNumber < 1 )); then
       echo "The new version you chose doesn't exist, please run this command again and pick a listed number"
-      exit
+     exit
    else
       jellyfin -S
       unlink /opt/jellyfin/jellyfin
@@ -111,6 +114,9 @@ Remove_version()
    if (( $versionToRemoveNumber > $maxNumber )); then
      echo "The new version you chose doesn't exist, please run this command again and pick a listed number"
      exit
+   elif (( $versionToRemoveNumber < 1 )); then
+      echo "The new version you chose doesn't exist, please run this command again and pick a listed number"
+     exit
    else
      rm -rfv /opt/jellyfin/$versionToRemove
    fi
@@ -119,29 +125,29 @@ Remove_version()
 Help()
 {
    # Display Help
-   echo "jellyfin - The CLI Tool"
-   echo "Version 1.3.7"
+   echo "jellyfin - The CLI Tool v1.4.0"
    echo "-Created by Smiley McSmiles"
    echo 
    echo "Syntax: jellyfin -[COMMAND] [PARAMETER]"
    echo "COMMANDS:"
-   echo "-b     [DIRECTORY] Input directory to output backup archive"
-   echo "-d     Disable Jellyfin on System Start"
-   echo "-e     Enable Jellyfin on System Start"
-   echo "-h     Print this Help"
-   echo "-i     [FILE.tar] Input file to Import jellyfin-backup.tar"
-   echo "-p     Reset the permissions of Jellyfin's Media Library"
-   echo "-r     Restart Jellyfin"
-   echo "-s     Start Jellyfin"
-   echo "-S     Stop Jellyfin"
-   echo "-t     Status of Jellyfin"
+   echo "-b     [DIRECTORY] Input directory to output backup archive."
+   echo "-d     Disable Jellyfin on System Start."
+   echo "-e     Enable Jellyfin on System Start."
+   echo "-h     Print this Help."
+   echo "-i     [FILE.tar] Input file to Import jellyfin-backup.tar."
+   echo "-p     Reset the permissions of Jellyfin's Media Library."
+   echo "-r     Restart Jellyfin."
+   echo "-s     Start Jellyfin."
+   echo "-S     Stop Jellyfin."
+   echo "-t     Status of Jellyfin."
    echo "-u     [URL - optional] Downloads and updates the current stable or supplied Jellyfin version."
-   echo "-U     Update Jellyfin - The CLI Tool"
-   echo "-ub    Update Jellyfin to the most recent Beta"
-   echo "-v     Get the current installed version of Jellyfin"
+   echo "-U     Update Jellyfin - The CLI Tool."
+   echo "-ub    Update Jellyfin to the most recent Beta."
+   echo "-v     Get the current installed version of Jellyfin."
    echo "-vs    Switch Jellyfin version for another previously installed version."
-   echo "-rv    Remove a Jellyfin version" 
-   echo "-X     Uninstall Jellyfin Completely"
+   echo "-rv    Remove a Jellyfin version."
+   echo "-rn    Batch renaming script for TV shows."
+   echo "-X     Uninstall Jellyfin Completely."
    echo
    echo "To browse Jellyfin versions please use this link."
    echo "***WARNING*** ONLY USE COMBINED(Web & Server) PACKAGES"
@@ -232,36 +238,50 @@ Permissions()
    chmod 770 $defaultPath;
 }
 
+Status()
+{
+   Check_disk_free
+   echo
+   echo
+   systemctl status jellyfin.service
+}
+
 Update()
 {
    customVersionLink=$1
    Has_sudo
-   if [[ $customVersionLink != "" ]]; then 
-   echo "Fetching custom Jellyfin version..."
-   customVersion=$(echo $customVersionLink | rev | cut -d/ -f1 | rev)
+   customVersion=""
+   fileType=""
+   jellyfin_archive=""
+   jellyfin=""
+   new_jellyfin_version=""
    
-   fileType=$(echo $customVersion | cut -d_ -f3)
-   if [[ $fileType != "amd64.tar.gz" ]]; then
-   echo "Supplied URL does not point to a amd64.tar.gz.. EXITING..."
-   exit
-   fi
+   if [[ $customVersionLink == *"://"* ]]; then 
+      echo "Fetching custom Jellyfin version..."
+      customVersion=$(echo $customVersionLink | rev | cut -d/ -f1 | rev)
+      fileType=$(echo $customVersion | cut -d_ -f3)
    
-   mkdir /opt/jellyfin/update
-   wget -P /opt/jellyfin/update/ $customVersionLink
-   jellyfin_archive=$customVersion
-   jellyfin=$(echo $jellyfin_archive | sed -r 's/_amd64.tar.gz//g')
-   new_jellyfin_version=$(echo $jellyfin | sed -r 's/jellyfin_//g')   
+      if [[ $fileType != "amd64.tar.gz" ]]; then
+         echo "Supplied URL does not point to a amd64.tar.gz.. EXITING..."
+         exit
+      fi
+   
+      mkdir /opt/jellyfin/update
+      wget -P /opt/jellyfin/update/ $customVersionLink
+      jellyfin_archive=$customVersion
+      jellyfin=$(echo $jellyfin_archive | sed -r 's/_amd64.tar.gz//g')
+      new_jellyfin_version=$(echo $jellyfin | sed -r 's/jellyfin_//g')   
    
    else
-   echo "Fetching newest Jellyfin version..."
-   mkdir /opt/jellyfin/update
-   wget -O /opt/jellyfin/update/index.html https://repo.jellyfin.org/releases/server/linux/stable/combined/
-   jellyfin_archive=$(grep 'amd64.tar.gz"' /opt/jellyfin/update/index.html | cut -d '"' -f 2)
-   jellyfin=$(echo $jellyfin_archive | sed -r 's/_amd64.tar.gz//g')
-   new_jellyfin_version=$(echo $jellyfin | sed -r 's/jellyfin_//g')
-   rm -f /opt/jellyfin/update/index.html
-   Check_Version
-   wget -O /opt/jellyfin/update/$jellyfin_archive https://repo.jellyfin.org/releases/server/linux/stable/combined/$jellyfin_archive
+      echo "Fetching newest Jellyfin version..."
+      mkdir /opt/jellyfin/update
+      wget -O /opt/jellyfin/update/index.html https://repo.jellyfin.org/releases/server/linux/stable/combined/
+      jellyfin_archive=$(grep 'amd64.tar.gz"' /opt/jellyfin/update/index.html | cut -d '"' -f 2)
+      jellyfin=$(echo $jellyfin_archive | sed -r 's/_amd64.tar.gz//g')
+      new_jellyfin_version=$(echo $jellyfin | sed -r 's/jellyfin_//g')
+      rm -f /opt/jellyfin/update/index.html
+      Check_Version
+      wget -O /opt/jellyfin/update/$jellyfin_archive https://repo.jellyfin.org/releases/server/linux/stable/combined/$jellyfin_archive
    fi
    
    echo "Unpacking $jellyfin_archive to /opt/jellyfin/..."
@@ -282,6 +302,10 @@ Update()
 Update_beta()
 {
    Has_sudo
+   jellyfin_archive=""
+   jellyfin=""
+   new_jellyfin_version=""
+   
    echo "Fetching newest beta Jellyfin version..."
    mkdir /opt/jellyfin/update
    wget -O /opt/jellyfin/update/index.html https://repo.jellyfin.org/releases/server/linux/stable-pre/
@@ -304,6 +328,70 @@ Update_beta()
    echo "Jellyfin updated to version $new_jellyfin_version"
    sed -i -e "s|currentVersion=.*|currentVersion=$jellyfin|g" /opt/jellyfin/config/jellyfin.conf
    jellyfin -s -t
+}
+
+Rename_tv()
+{
+   clear
+   echo "***WARNING***"
+   echo "TV SHOW FILE NAMES MUST CONTAIN 'SXXEXX' X=number"
+   echo
+   echo "Please enter the directory to correct"
+   echo "For example:"
+   echo "/jfin/TV/*/*/* <- For every Episode(May Crash Be Careful!)"
+   echo "OR:"
+   echo "/jfin/TV/Breaking\ Bad/*/* <- For Every Episode in a show"
+   echo "OR:"
+   echo "/jfin/TV/Breaking\ Bad/Season\ 2/* <- For Every Episode in a season of a show"
+   echo
+   read directoryToCorrect
+   # Problematic code:
+   #directoryToCorrect=$(echo $directoryToCorrect2 | sed -r 's/ /*/g')
+   clear
+   nameOfTestFile=$(ls -1 $directoryToCorrect | head -1)
+   name2=$(echo $nameOfTestFile | cut -d "/" -f 2)
+   name3=$(echo $nameOfTestFile | cut -d "/" -f 3)
+   name4=$(echo $nameOfTestFile | cut -d "/" -f 4)
+   name5=$(echo $nameOfTestFile | cut -d "/" -f 5)
+   name6=$(echo $nameOfTestFile | cut -d "/" -f 6)
+   echo "2:$name2"
+   echo "3:$name3"
+   echo "4:$name4"
+   echo "5:$name5"
+   echo "6:$name6"
+   echo
+   echo "BE ADVISED, IF YOU'RE RE-NAMING MULTIPLE SHOWS, MAKE SURE ALL THE SHOW DIRECTORY"
+   echo "NAMES ARE IN THE SAME LOCATION IN THE DIRECTORY"
+   echo
+   echo "Please enter the number that corresponds with the show's name above"
+   read directoryNumber
+   nameOfShow=$(dirname "$directoryToCorrect2" | cut -d "/" -f $directoryNumber)
+   echo "You chose $nameOfShow"
+
+   for item in $directoryToCorrect
+   do
+      echo $item
+         if [[ "$item" == *[sS][0-9][0-9][eE][0-9][0-9]* ]]; then
+            extensionOfFile="${item##*.}"
+            nameOfDirectory=$(dirname "$item")
+            nameOfShow=$(dirname "$item" | cut -d "/" -f $directoryNumber)
+            episodeNumber=$(echo "$item" | grep -oE '[sS][0-9][0-9][eE][0-9][0-9]')
+            mv "$item" "$nameOfDirectory/$nameOfShow $episodeNumber.$extensionOfFile"
+            echo "item:"
+            echo "$item"
+            #echo "Directory:"
+            #echo "$nameOfDirectory"
+            #echo "Name Of Show:"
+            #echo $nameOfShow
+            #echo "Episode:"
+            #echo "$episodeNumber"
+            #echo "extensionOfFile:"
+            #echo "$extensionOfFile"
+            echo "New Name:"
+            echo "$nameOfDirectory/$nameOfShow $episodeNumber.$extensionOfFile"
+            echo
+         fi
+   done
 }
 
 Uninstall()
@@ -348,9 +436,9 @@ Has_sudo()
       source /opt/jellyfin/config/jellyfin.conf
    else
       has_sudo_access="NO"
-	   echo "$USER, you're not using sudo..."
-      echo "Please use 'sudo jellyfin -[b|d|e|h|i|p|r|s|S|u|U|ub|v|X] [OPTIONS]'"
-	   exit
+      echo "$USER, you're not using sudo..."
+      echo "Please use 'sudo jellyfin -[COMMAND] [PARAMETERS]'"
+      exit
    fi
 }
 
@@ -372,24 +460,24 @@ if [ -n "$1" ]; then
          -e) systemctl enable jellyfin.service ;;
          -h) Help ;;
          -i) Import $2
-             shift;;
+             shift ;;
          -p) Permissions ;;
          -r) systemctl restart jellyfin.service ;;
          -s) systemctl start jellyfin.service ;;
          -S) systemctl stop jellyfin.service ;;
-         -t) clear && Check_disk_free && echo "" && echo "" && systemctl status jellyfin.service ;;
+         -t) Status ;;
          -u) if [[ "$2" == "-"* ]]; then
-             Update
+                Update
              else
-             Update $2
-             shift
-             fi
-             ;;
+                Update $2
+                shift
+             fi ;;
          -U) Update-cli ;;
          -ub) Update_beta ;;
-	 -v) Get_version ;;
-	 -vs) Version_switch ;;
-	 -rv) Remove_version ;;
+	      -v) Get_version ;;
+	      -vs) Version_switch ;;
+	      -rv) Remove_version ;;
+	      -rn) Raname_tv ;;
          -X) Uninstall ;;
          *) echo "Option $1 not recognized" 
             Help ;;
@@ -397,7 +485,7 @@ if [ -n "$1" ]; then
       shift
    done
 else
-	echo "No parameters found."
+	echo "No commands found."
 	Help
 	exit
 fi
