@@ -1,4 +1,4 @@
-![jellyfin-cli](.github/banner-dark.png?raw=true "Jellyfin Logo")
+![jellyfin-cli](.github/banner-shadow.png?raw=true "Jellyfin Logo")
 ======
 
 > v-1.3.7 CLI companion tool for the Jellyfin amd64.tar.gz installer
