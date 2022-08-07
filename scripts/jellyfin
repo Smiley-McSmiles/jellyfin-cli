@@ -96,11 +96,31 @@ Version_switch()
    fi
 }
 
+Remove_version()
+{
+   echo "Current Jellyfin version installed"
+   Get_version
+   echo ""
+   echo "Jellyfin versions already downloaded:"
+   ls /opt/jellyfin/ | grep "_" | cat -n
+   echo ""
+   echo "Please enter the number corresponding with"
+   read -p "the version you want to erase : " versionToRemoveNumber
+   maxNumber=$(ls /opt/jellyfin/ | grep "_" | wc -l)
+   versionToRemove=$(ls /opt/jellyfin/ | grep "_" | head -n $versionToRemoveNumber | tail -n 1)
+   if (( $versionToRemoveNumber > $maxNumber )); then
+     echo "The new version you chose doesn't exist, please run this command again and pick a listed number"
+     exit
+   else
+     rm -rfv /opt/jellyfin/$versionToRemove
+   fi
+}
+
 Help()
 {
    # Display Help
    echo "jellyfin - The CLI Tool"
-   echo "Version 1.3.6"
+   echo "Version 1.3.7"
    echo "-Created by Smiley McSmiles"
    echo 
    echo "Syntax: jellyfin -[b|d|e|h|i|p|r|s|S|u|U|ub|v|vs|X] [OPTIONS]"
@@ -120,6 +140,7 @@ Help()
    echo "-ub    Update Jellyfin to the most recent Beta"
    echo "-v     Get the current installed version of Jellyfin"
    echo "-vs    Switch Jellyfin version for another previously installed version."
+   echo "-rv    Remove a Jellyfin version" 
    echo "-X     Uninstall Jellyfin Completely"
    echo
    echo "To browse Jellyfin versions please use this link."
@@ -357,12 +378,18 @@ if [ -n "$1" ]; then
          -s) systemctl start jellyfin.service ;;
          -S) systemctl stop jellyfin.service ;;
          -t) clear && Check_disk_free && echo "" && echo "" && systemctl status jellyfin.service ;;
-         -u) Update $2
-             shift;;
+         -u) if [[ "$2" == "-"* ]]; then
+             Update
+             else
+             Update $2
+             shift
+             fi
+             ;;
          -U) Update-cli ;;
          -ub) Update_beta ;;
 	 -v) Get_version ;;
 	 -vs) Version_switch ;;
+	 -rv) Remove_version ;;
          -X) Uninstall ;;
          *) echo "Option $1 not recognized" 
             Help ;;

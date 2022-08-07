@@ -117,11 +117,12 @@ fi
 
 cp scripts/jellyfin /bin/
 cp scripts/jellyfin.sh /opt/jellyfin/
-cp $jellyfin_archive /opt/jellyfin/
+mv $jellyfin_archive /opt/jellyfin/
 cp conf/jellyfin.service /usr/lib/systemd/system/
 cp conf/jellyfin.conf /etc/
 cd /opt/jellyfin
 tar xvzf $jellyfin_archive
+rm -f $jellyfin_archive
 ln -s $jellyfin jellyfin
 mkdir data cache config log
 touch config/jellyfin.conf

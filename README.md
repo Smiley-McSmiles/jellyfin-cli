@@ -1,7 +1,7 @@
 ![jellyfin-cli](.github/banner-light.png?raw=true "Jellyfin Logo")
 ======
 
-> v-1.3.6 CLI tool for Jellyfin tar.gz installer
+> v-1.3.7 CLI tool for Jellyfin tar.gz installer
 
 > Tested on Fedora 34/35/36, Ubuntu 22.04, Manjaro 21.3.6
 
@@ -22,6 +22,7 @@
 * **Backup** - Input a directroy to output the backup archive.
 * **Import** - Import a .tar file to pick up where you left off on another system.
 * **Get Version** - Get the current installed version of Jellyfin.
+* **Remove Version** - Remove a specific version of Jellyfin
 * **Version Switch** - Switch Jellyfin version for another previously installed version.
 * **Uninstall** - Uninstalls Jellyfin completely (Ignores the Media Directory).
 
@@ -57,6 +58,7 @@ options:
 -ub    Update Jellyfin to the most recent Beta
 -v     Get the current version of Jellyfin.
 -vs    Switch Jellyfin version for another previously installed version.
+-rv    Remove a Jellyfin version
 -X     Uninstall Jellyfin Completely
 ```
 
