@@ -123,8 +123,8 @@ Help()
    echo "Version 1.3.7"
    echo "-Created by Smiley McSmiles"
    echo 
-   echo "Syntax: jellyfin -[b|d|e|h|i|p|r|s|S|u|U|ub|v|vs|X] [OPTIONS]"
-   echo "options:"
+   echo "Syntax: jellyfin -[COMMAND] [PARAMETER]"
+   echo "COMMANDS:"
    echo "-b     [DIRECTORY] Input directory to output backup archive"
    echo "-d     Disable Jellyfin on System Start"
    echo "-e     Enable Jellyfin on System Start"
