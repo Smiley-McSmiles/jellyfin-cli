@@ -1,7 +1,7 @@
 ![jellyfin-cli](.github/banner-light.png?raw=true "Jellyfin Logo")
 ======
 
-> v-1.3.7 CLI tool for Jellyfin tar.gz installer
+> v-1.3.7 CLI companion tool for the Jellyfin amd64.tar.gz installer
 
 > Tested on Fedora 34/35/36, Ubuntu 22.04, Manjaro 21.3.6
 
