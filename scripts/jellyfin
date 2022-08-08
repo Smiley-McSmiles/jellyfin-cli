@@ -119,7 +119,7 @@ Remove_version()
 Help()
 {
    # Display Help
-   echo "jellyfin - The CLI Tool v1.4.3"
+   echo "jellyfin - The CLI Tool v1.4.4"
    echo "-Created by Smiley McSmiles"
    echo 
    echo "Syntax: jellyfin -[COMMAND] [PARAMETER]"
@@ -306,22 +306,27 @@ Update_beta()
    jellyfin_archive=$(grep 'amd64.tar.gz' /opt/jellyfin/update/index.html | grep 'combined' | cut -d '/' -f5 | cut -d '<' -f1 | head -n 1)
    jellyfin=$(echo $jellyfin_archive | sed -r 's/_amd64.tar.gz//g')
    new_jellyfin_version=$(echo $jellyfin | sed -r 's/jellyfin_//g')
-   rm -f /opt/jellyfin/update/index.html
-   Check_Version
-   wget -O /opt/jellyfin/update/$jellyfin_archive https://repo.jellyfin.org/releases/server/linux/stable-pre/$new_jellyfin_version/combined/$jellyfin_archive
+   if [[ ! -n $jellyfin_archive ]] || [[ ! -n $jellyfin ]]; then
+      echo "Sorry there appears to be no Jellyfin Betas right now..."
+      exit
+   else
+      rm -f /opt/jellyfin/update/index.html
+      Check_Version
+      wget -O /opt/jellyfin/update/$jellyfin_archive https://repo.jellyfin.org/releases/server/linux/stable-pre/$new_jellyfin_version/combined/$jellyfin_archive
 
-   echo "Unpacking $jellyfin_archive to /opt/jellyfin/..."
-   tar xvzf /opt/jellyfin/update/$jellyfin_archive -C /opt/jellyfin/
-   jellyfin -S
-   unlink /opt/jellyfin/jellyfin
-   ln -s /opt/jellyfin/$jellyfin /opt/jellyfin/jellyfin
-   echo "Removing $jellyfin_archive"
-   rm -rfv /opt/jellyfin/update
+      echo "Unpacking $jellyfin_archive to /opt/jellyfin/..."
+      tar xvzf /opt/jellyfin/update/$jellyfin_archive -C /opt/jellyfin/
+      jellyfin -S
+      unlink /opt/jellyfin/jellyfin
+      ln -s /opt/jellyfin/$jellyfin /opt/jellyfin/jellyfin
+      echo "Removing $jellyfin_archive"
+      rm -rfv /opt/jellyfin/update
 
-   chown -R $defaultUser:$defaultUser /opt/jellyfin
-   echo "Jellyfin updated to version $new_jellyfin_version"
-   sed -i -e "s|currentVersion=.*|currentVersion=$jellyfin|g" /opt/jellyfin/config/jellyfin.conf
-   jellyfin -s -t
+      chown -R $defaultUser:$defaultUser /opt/jellyfin
+      echo "Jellyfin updated to version $new_jellyfin_version"
+      sed -i -e "s|currentVersion=.*|currentVersion=$jellyfin|g" /opt/jellyfin/config/jellyfin.conf
+      jellyfin -s -t
+   fi
 }
 
 Rename_tv()
