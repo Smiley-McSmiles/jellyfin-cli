@@ -1,7 +1,7 @@
 ![jellyfin-cli](.github/banner-shadow.png?raw=true "Jellyfin Logo")
 ======
 
-> v1.4.0 CLI companion tool for the Jellyfin amd64.tar.gz package
+> v1.4.1 CLI companion tool for the Jellyfin amd64.tar.gz package
 
 > Tested on Fedora 34/35/36, Ubuntu 22.04, Manjaro 21.3.6
 
