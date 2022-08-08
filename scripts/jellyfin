@@ -474,10 +474,10 @@ if [ -n "$1" ]; then
              fi ;;
          -U) Update-cli ;;
          -ub) Update_beta ;;
-	      -v) Get_version ;;
-	      -vs) Version_switch ;;
-	      -rv) Remove_version ;;
-	      -rn) Raname_tv ;;
+	 -v) Get_version ;;
+	 -vs) Version_switch ;;
+	 -rv) Remove_version ;;
+	 -rn) Rename_tv ;;
          -X) Uninstall ;;
          *) echo "Option $1 not recognized" 
             Help ;;
