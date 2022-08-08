@@ -83,14 +83,8 @@ Version_switch()
    read -p "the version you want to install : " versionToSwitchNumber
    newVersion=$(ls /opt/jellyfin/ | grep "_" | head -n $versionToSwitchNumber | tail -n 1)
    maxNumber=$(ls /opt/jellyfin/ | grep "_" | wc -l)
-      if [[ $versionToSwitchNumber =~ ^[a-zA-Z]+$ ]]; then
-     echo "The new version you chose doesn't exist, please run this command again and pick a listed NUMBER"
-     exit
-   elif (( $versionToSwitchNumber > $maxNumber )); then
-     echo "The new version you chose doesn't exist, please run this command again and pick a LISTED number"
-     exit
-   elif (( $versionToSwitchNumber < 1 )); then
-      echo "The new version you chose doesn't exist, please run this command again and pick a LISTED number"
+    if [[ $versionToSwitchNumber == *['!'@#\$%^\&*()_+.]* ]] || [[ $versionToSwitchNumber =~ [a-zA-Z]+$ ]] || (( $versionToSwitchNumber > $maxNumber )) || (( $versionToSwitchNumber < 1 )); then
+      echo "The new version you chose doesn't exist, please run this command again and pick a LISTED NUMBER"
      exit
    else
       jellyfin -S
@@ -114,14 +108,8 @@ Remove_version()
    read -p "the version you want to erase : " versionToRemoveNumber
    maxNumber=$(ls /opt/jellyfin/ | grep "_" | wc -l)
    versionToRemove=$(ls /opt/jellyfin/ | grep "_" | head -n $versionToRemoveNumber | tail -n 1)
-   if [[ $versionToRemoveNumber =~ ^[a-zA-Z]+$ ]]; then
-     echo "The new version you chose doesn't exist, please run this command again and pick a listed NUMBER"
-     exit
-   elif (( $versionToRemoveNumber > $maxNumber )); then
-     echo "The new version you chose doesn't exist, please run this command again and pick a LISTED number"
-     exit
-   elif (( $versionToRemoveNumber < 1 )); then
-      echo "The new version you chose doesn't exist, please run this command again and pick a LISTED number"
+    if [[ $versionToRemoveNumber == *['!'@#\$%^\&*()_+.]* ]] || [[ $versionToRemoveNumber =~ [a-zA-Z]+$ ]] || (( $versionToRemoveNumber > $maxNumber )) || (( $versionToRemoveNumber < 1 )); then
+      echo "The new version you chose doesn't exist, please run this command again and pick a LISTED NUMBER"
      exit
    else
      rm -rfv /opt/jellyfin/$versionToRemove
@@ -131,7 +119,7 @@ Remove_version()
 Help()
 {
    # Display Help
-   echo "jellyfin - The CLI Tool v1.4.2"
+   echo "jellyfin - The CLI Tool v1.4.3"
    echo "-Created by Smiley McSmiles"
    echo 
    echo "Syntax: jellyfin -[COMMAND] [PARAMETER]"
