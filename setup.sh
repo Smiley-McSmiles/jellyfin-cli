@@ -127,6 +127,8 @@ ln -s $jellyfin jellyfin
 mkdir data cache config log
 touch config/jellyfin.conf
 echo "defaultPath=" >> config/jellyfin.conf
+echo "apiKey=" >> config/jellyfin.conf
+echo "networkPort=8096"
 echo "currentVersion=$jellyfin" >> config/jellyfin.conf
 echo "defaultUser=$defaultUser" >> config/jellyfin.conf
 

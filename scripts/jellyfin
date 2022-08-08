@@ -119,7 +119,7 @@ Remove_version()
 Help()
 {
    # Display Help
-   echo "jellyfin - The CLI Tool v1.4.4"
+   echo "jellyfin - The CLI Tool v1.4.5"
    echo "-Created by Smiley McSmiles"
    echo 
    echo "Syntax: jellyfin -[COMMAND] [PARAMETER]"
@@ -141,6 +141,9 @@ Help()
    echo "-vs    Switch Jellyfin version for another previously installed version."
    echo "-rv    Remove a Jellyfin version."
    echo "-rn    Batch renaming script for TV shows."
+   echo "-ls    Tell Jellyfin to scan your media library."
+   echo "-cp    Change Jellyfins network port - Default = 8096"
+   echo "-ik    Import an API key"
    echo "-X     Uninstall Jellyfin Completely."
    echo
    echo "To browse Jellyfin versions please use this link."
@@ -204,6 +207,66 @@ Import()
    else
       echo "Returning..."
    fi    
+}
+
+Library_scan()
+{
+   Has_sudo
+   source /opt/jellyfin/config/jellyfin.conf
+   Check_api_key
+   curl -d POST http://localhost:$networkPort/Library/Refresh?api_key=$apiKey
+}
+
+Import_api_key()
+{
+   Has_sudo
+   echo "Create a API key by signing into Jellyfin, going to Dashboard, then"
+   echo "clicking on API Keys under the Advanced section on the left."
+   echo
+   read -p "Please paste your API Key : " newAPIKey
+   if [[ -n $newAPIKey ]]; then
+      echo "Logging new api key."
+      sed -i -e "s|apiKey=.*|apiKey=$newAPIKey|g" /opt/jellyfin/config/jellyfin.conf
+   else
+      echo "Warning no input detected, please re-enter the command and paste an API key"
+      exit
+   fi
+}
+
+Check_api_key()
+{
+   Has_sudo
+   source /opt/jellyfin/config/jellyfin.conf
+   if [[ ! -n $apiKey ]]; then
+      echo "***ERROR***"
+      echo "NO API KEY FOUND PLEASE RUN 'sudo jellyfin -ik' TO IMPORT A NEW KEY!"
+      return 1
+      exit
+   else
+      return 0
+   fi
+}
+
+Network_port_change()
+{
+   Has_sudo
+   source /opt/jellyfin/config/jellyfin.conf
+   echo
+   echo
+   read -p "Please enter the new network port for Jellyfin: " port
+   sed -i -e "s|networkPort=.*|networkPort=$port|g" /opt/jellyfin/config/jellyfin.conf
+   sed -i -e "s|<HttpServerPortNumber>*</HttpServerPortNumber>|<HttpServerPortNumber>$port</HttpServerPortNumber>|g" /opt/jellyfin/config/network.xml
+   sed -i -e "s|<PublicPort>*</PublicPort>|<PublicPort>$port</PublicPort>|g" /opt/jellyfin/config/network.xml
+   echo "Unblocking port $port..."
+   if [ -x "$(command -v ufw)" ]; then
+	   ufw allow $port
+	   ufw reload
+   elif [ -x "$(command -v firewall-cmd)" ]; then 
+	   firewall-cmd --permanent --zone=public --add-port=$port/tcp
+	   firewall-cmd --permanent --zone=public --add-port=$port/udp
+	   firewall-cmd --reload
+   else echo "FAILED TO OPEN PORT $port! ERROR NO 'ufw' OR 'firewall-cmd' COMMAND FOUND!";
+   fi   
 }
 
 Permissions()
@@ -421,7 +484,24 @@ Update-cli()
    echo "Updating Jellyfin - The CLI Tool"
    git clone https://github.com/Smiley-McSmiles/jellyfin-cli
    cp -f jellyfin-cli/scripts/jellyfin /usr/bin/
-   cp -f jellyfin-cli/jellyfin.1 /usr/local/share/man/man1/
+   if [ -x "$(command -v apt)" ]; then
+      cp jellyfin-cli/jellyfin.1 /usr/share/man/man1/
+   elif [ -x "$(command -v dnf)" ]; then 
+      cp jellyfin-cli/jellyfin.1 /usr/local/share/man/man1/
+   elif [ -x "$(command -v pacman)" ]; then 
+      cp jellyfin-cli/jellyfin.1 /usr/share/man/man1/
+   elif [ -x "$(command -v zypper)" ]; then 
+      cp jellyfin-cli/jellyfin.1 /usr/local/share/man/man1/
+   fi
+   
+   if [[ ! grep -q apiKey= "/opt/jellyfin/config/jellyfin.conf" ]]; then
+      echo "apiKey="* >> /opt/jellyfin/config/jellyfin.conf
+   fi
+
+   if [[ ! grep -q networkPort=8096 "/opt/jellyfin/config/jellyfin.conf" ]]; then
+      echo "networkPort=8096" >> /opt/jellyfin/config/jellyfin.conf
+   fi
+
    rm -rf jellyfin-cli
    echo "...complete"
 }
@@ -473,10 +553,13 @@ if [ -n "$1" ]; then
              fi ;;
          -U) Update-cli ;;
          -ub) Update_beta ;;
-	 -v) Get_version ;;
-	 -vs) Version_switch ;;
-	 -rv) Remove_version ;;
-	 -rn) Rename_tv ;;
+         -v) Get_version ;;
+         -vs) Version_switch ;;
+         -rv) Remove_version ;;
+         -rn) Rename_tv ;;
+         -ls) Library_scan ;;
+         -cp) Network_port_change ;;
+         -ik) Import_api_key ;;
          -X) Uninstall ;;
          *) echo "Option $1 not recognized" 
             Help ;;

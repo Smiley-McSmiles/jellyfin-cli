@@ -1,7 +1,7 @@
 ![jellyfin-cli](.github/banner-shadow.png?raw=true "Jellyfin Logo")
 ======
 
-> v1.4.4 CLI companion tool for the Jellyfin amd64.tar.gz package
+> v1.4.5 CLI companion tool for the Jellyfin amd64.tar.gz package
 
 > Tested on Fedora 34/35/36, Ubuntu 22.04, Manjaro 21.3.6
 
@@ -25,6 +25,9 @@
 * **Remove Version** - Remove a specific version of Jellyfin
 * **Version Switch** - Switch Jellyfin version for another previously installed version.
 * **Rename TV** - Batch renaming script for TV shows.
+* **Library Scan** - Tell Jellyfin to scan your media library."
+* **Change Port** - Change Jellyfins network port - Default = 8096."
+* **Import API Key** - Import a new API key."
 * **Uninstall** - Uninstalls Jellyfin completely (Ignores the Media Directory).
 
 ### Getting Started
@@ -62,6 +65,9 @@ COMMANDS:
 -vs    Switch Jellyfin version for another previously installed version.
 -rv    Remove a Jellyfin version.
 -rn    Batch renaming script for TV shows.
+-ls    Tell Jellyfin to scan your media library.
+-cp    Change Jellyfins network port - Default = 8096.
+-ik    Import an API key.
 -X     Uninstall Jellyfin Completely.
 
 EXAMPLE:
