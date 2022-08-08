@@ -25,9 +25,9 @@
 * **Remove Version** - Remove a specific version of Jellyfin
 * **Version Switch** - Switch Jellyfin version for another previously installed version.
 * **Rename TV** - Batch renaming script for TV shows.
-* **Library Scan** - Tell Jellyfin to scan your media library."
-* **Change Port** - Change Jellyfins network port - Default = 8096."
-* **Import API Key** - Import a new API key."
+* **Library Scan** - Tell Jellyfin to scan your media library.
+* **Change Port** - Change Jellyfins network port - Default = 8096.
+* **Import API Key** - Import a new API key.
 * **Uninstall** - Uninstalls Jellyfin completely (Ignores the Media Directory).
 
 ### Getting Started
