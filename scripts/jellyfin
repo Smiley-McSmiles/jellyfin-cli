@@ -494,7 +494,7 @@ Update-cli()
       cp jellyfin-cli/jellyfin.1 /usr/local/share/man/man1/
    fi
    
-   if [[ ! grep -q apiKey= "/opt/jellyfin/config/jellyfin.conf" ]]; then
+   if ! grep -q apiKey= "/opt/jellyfin/config/jellyfin.conf"; then
       echo "apiKey="* >> /opt/jellyfin/config/jellyfin.conf
    fi
 
