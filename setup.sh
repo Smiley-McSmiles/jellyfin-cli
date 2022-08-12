@@ -128,17 +128,17 @@ mkdir data cache config log
 touch config/jellyfin.conf
 echo "defaultPath=" >> config/jellyfin.conf
 echo "apiKey=" >> config/jellyfin.conf
-echo "networkPort=8096"
+echo "networkPort=8096" >> config/jellyfin.conf
 echo "currentVersion=$jellyfin" >> config/jellyfin.conf
 echo "defaultUser=$defaultUser" >> config/jellyfin.conf
 
 echo "Preparing to install needed dependancies for Jellyfin..."
 echo
 
-packagesNeededDebian='ffmpeg git net-tools'
-packagesNeededFedora='ffmpeg ffmpeg-devel ffmpeg-libs git'
-packagesNeededArch='ffmpeg git'
-packagesNeededOpenSuse='ffmpeg-4 git'
+packagesNeededDebian='ffmpeg git net-tools openssl'
+packagesNeededFedora='ffmpeg ffmpeg-devel ffmpeg-libs git openssl'
+packagesNeededArch='ffmpeg git openssl'
+packagesNeededOpenSuse='ffmpeg-4 git openssl'
 if [ -x "$(command -v apt)" ]; then
         add-apt-repository universe -y
         apt update -y
@@ -154,20 +154,27 @@ else
 	echo "FAILED TO INSTALL PACKAGES: Package manager not found. You must manually install: ffmpeg and git";
 fi
 
+echo "creating OpenSSL self signed certificate for https"
+mnkdir /opt/jellyfin/cert
+openssl req -x509 -newkey rsa:4096 -keyout /opt/jellyfin/cert/privkey.pem -out /opt/jellyfin/cert/cert.pem -days 365 -nodes -subj '/CN=jellyfin.lan'
+openssl pkcs12 -export -out /opt/jellyfin/cert/jellyfin.pfx -inkey /opt/jellyfin/cert/privkey.pem -in /opt/jellyfin/cert/cert.pem -passout pass:
+
+
 echo "Setting Permissions for Jellyfin..."
 chown -R $defaultUser:$defaultUser /opt/jellyfin
 chmod u+x jellyfin.sh
 chmod +x /bin/jellyfin
 
-echo "Unblocking port 8096..."
+echo "Unblocking port 8096 and 8920..."
 if [ -x "$(command -v ufw)" ]; then
 	ufw allow 8096
+	ufw allow 8920
 	ufw reload
 elif [ -x "$(command -v firewall-cmd)" ]; then 
 	firewall-cmd --permanent --zone=public --add-port=8096/tcp
-	firewall-cmd --permanent --zone=public --add-port=8096/udp
+	firewall-cmd --permanent --zone=public --add-port=8920/tcp
 	firewall-cmd --reload
-else echo "FAILED TO OPEN PORT 8096! ERROR NO 'ufw' OR 'firewall-cmd' COMMAND FOUND!";
+else echo "FAILED TO OPEN PORT 8096/8920! ERROR NO 'ufw' OR 'firewall-cmd' COMMAND FOUND!";
 fi
 
 echo "Enabling jellyfin.service..."
@@ -184,7 +191,10 @@ echo "DONE"
 echo
 echo "Navigate to http://localhost:8096/ in your Web Browser to claim your"
 echo "Jellyfin server"
+echo "If allowing remote access please enable https under Dashboard>Networking>"
+echo "and set the 'custom SSL certificate key' enter '/opt/jellyfin/cert/jellyfin.pfx'"
 echo
 echo "To manage Jellyfin use 'jellyfin -h'"
 echo
+read -p "Press ENTER to continue" ENTER
 jellyfin -h
