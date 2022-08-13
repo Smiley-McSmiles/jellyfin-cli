@@ -417,10 +417,15 @@ Update_beta()
 
 Recertify_https()
 {
+   Has_sudo
    echo "creating OpenSSL self signed certificate for https. Valid for the next 365 days."
+   source /opt/jellyfin/config/jellyfin.conf
+
    rm -fv /opt/jellyfin/cert/*
    openssl req -x509 -newkey rsa:4096 -keyout /opt/jellyfin/cert/privkey.pem -out /opt/jellyfin/cert/cert.pem -days 365 -nodes -subj '/CN=jellyfin.lan'
    openssl pkcs12 -export -out /opt/jellyfin/cert/jellyfin.pfx -inkey /opt/jellyfin/cert/privkey.pem -in /opt/jellyfin/cert/cert.pem -passout pass:
+   chown -Rf $defaultUser /opt/jellyfin/cert
+   chmod -rf 770 /opt/jellyfin/cert
    jellyfin -r
 }
 
