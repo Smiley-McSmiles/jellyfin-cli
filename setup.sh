@@ -128,7 +128,8 @@ mkdir data cache config log
 touch config/jellyfin.conf
 echo "defaultPath=" >> config/jellyfin.conf
 echo "apiKey=" >> config/jellyfin.conf
-echo "networkPort=8096" >> config/jellyfin.conf
+echo "httpPort=8096" >> config/jellyfin.conf
+echo "httpsPort=8920" >> config/jellyfin.conf
 echo "currentVersion=$jellyfin" >> config/jellyfin.conf
 echo "defaultUser=$defaultUser" >> config/jellyfin.conf
 
@@ -154,8 +155,8 @@ else
 	echo "FAILED TO INSTALL PACKAGES: Package manager not found. You must manually install: ffmpeg and git";
 fi
 
-echo "creating OpenSSL self signed certificate for https"
-mnkdir /opt/jellyfin/cert
+echo "creating OpenSSL self signed certificate for https. Valid for the next 365 days."
+mkdir /opt/jellyfin/cert
 openssl req -x509 -newkey rsa:4096 -keyout /opt/jellyfin/cert/privkey.pem -out /opt/jellyfin/cert/cert.pem -days 365 -nodes -subj '/CN=jellyfin.lan'
 openssl pkcs12 -export -out /opt/jellyfin/cert/jellyfin.pfx -inkey /opt/jellyfin/cert/privkey.pem -in /opt/jellyfin/cert/cert.pem -passout pass:
 
@@ -177,9 +178,12 @@ elif [ -x "$(command -v firewall-cmd)" ]; then
 else echo "FAILED TO OPEN PORT 8096/8920! ERROR NO 'ufw' OR 'firewall-cmd' COMMAND FOUND!";
 fi
 
+echo "Enabling https..."
+sed -i -e "s|<EnableHttps>*</EnableHttps>|<EnableHttps>true</EnableHttps>|g" /opt/jellyfin/config/network.xml
+sed -i -e "s|<CertificatePath>*</CertificatePath>|<CertificatePath>/opt/jellyfin/cert/jellyfin.pfx</CertificatePath>|g" /opt/jellyfin/config/network.xml
+
 echo "Enabling jellyfin.service..."
 systemctl enable --now jellyfin.service
-systemctl status jellyfin.service
 echo
 
 echo "Removing git cloned directory:$DIRECTORY..."
@@ -189,12 +193,12 @@ echo
 echo
 echo "DONE"
 echo
-echo "Navigate to http://localhost:8096/ in your Web Browser to claim your"
-echo "Jellyfin server"
-echo "If allowing remote access please enable https under Dashboard>Networking>"
-echo "and set the 'custom SSL certificate key' enter '/opt/jellyfin/cert/jellyfin.pfx'"
+echo "Navigate to http://localhost:8096/ or https://localhost:8920/"
+echo "in your Web Browser to claim your Jellyfin server"
 echo
 echo "To manage Jellyfin use 'jellyfin -h'"
 echo
 read -p "Press ENTER to continue" ENTER
 jellyfin -h
+read -p "Press ENTER to continue" ENTER
+systemctl status jellyfin.service

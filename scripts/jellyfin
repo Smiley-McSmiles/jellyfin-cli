@@ -119,7 +119,7 @@ Remove_version()
 Help()
 {
    # Display Help
-   echo "jellyfin - The CLI Tool v1.4.5"
+   echo "jellyfin - The CLI Tool v1.4.6"
    echo "-Created by Smiley McSmiles"
    echo 
    echo "Syntax: jellyfin -[COMMAND] [PARAMETER]"
@@ -140,9 +140,11 @@ Help()
    echo "-v     Get the current installed version of Jellyfin."
    echo "-vs    Switch Jellyfin version for another previously installed version."
    echo "-rv    Remove a Jellyfin version."
+   echo "-rc    Removes old https certifications and creates new ones for the next 365 days."
    echo "-rn    Batch renaming script for TV shows."
    echo "-ls    Tell Jellyfin to scan your media library."
-   echo "-cp    Change Jellyfins network port - Default = 8096"
+   echo "-cp    Change Jellyfins http network port - Default = 8096"
+   echo "-cps   Change Jellyfins https network port - Default = 8920."
    echo "-ik    Import an API key"
    echo "-X     Uninstall Jellyfin Completely."
    echo
@@ -247,14 +249,14 @@ Check_api_key()
    fi
 }
 
-Network_port_change()
+Http_port_change()
 {
    Has_sudo
    source /opt/jellyfin/config/jellyfin.conf
    echo
-   echo
-   read -p "Please enter the new network port for Jellyfin: " port
-   sed -i -e "s|networkPort=.*|networkPort=$port|g" /opt/jellyfin/config/jellyfin.conf
+   echo "Default http port is 8096"
+   read -p "Please enter the new http network port for Jellyfin: " port
+   sed -i -e "s|httpPort=.*|httpPort=$port|g" /opt/jellyfin/config/jellyfin.conf
    sed -i -e "s|<HttpServerPortNumber>*</HttpServerPortNumber>|<HttpServerPortNumber>$port</HttpServerPortNumber>|g" /opt/jellyfin/config/network.xml
    sed -i -e "s|<PublicPort>*</PublicPort>|<PublicPort>$port</PublicPort>|g" /opt/jellyfin/config/network.xml
    echo "Unblocking port $port..."
@@ -263,11 +265,32 @@ Network_port_change()
 	   ufw reload
    elif [ -x "$(command -v firewall-cmd)" ]; then 
 	   firewall-cmd --permanent --zone=public --add-port=$port/tcp
-	   firewall-cmd --permanent --zone=public --add-port=$port/udp
 	   firewall-cmd --reload
    else echo "FAILED TO OPEN PORT $port! ERROR NO 'ufw' OR 'firewall-cmd' COMMAND FOUND!";
    fi   
 }
+
+Https_port_change()
+{
+   Has_sudo
+   source /opt/jellyfin/config/jellyfin.conf
+   echo
+   echo "Default https port is 8920"
+   read -p "Please enter the new https network port for Jellyfin: " port
+   sed -i -e "s|httpsPort=.*|httpsPort=$port|g" /opt/jellyfin/config/jellyfin.conf
+   sed -i -e "s|<HttpsServerPortNumber>*</HttpsServerPortNumber>|<HttpsServerPortNumber>$port</HttpsServerPortNumber>|g" /opt/jellyfin/config/network.xml
+   sed -i -e "s|<PublicHttpsPort>*</PublicHttpsPort>|<PublicHttpsPort>$port</PublicHttpsPort>|g" /opt/jellyfin/config/network.xml
+   echo "Unblocking port $port..."
+   if [ -x "$(command -v ufw)" ]; then
+	   ufw allow $port
+	   ufw reload
+   elif [ -x "$(command -v firewall-cmd)" ]; then 
+	   firewall-cmd --permanent --zone=public --add-port=$port/tcp
+	   firewall-cmd --reload
+   else echo "FAILED TO OPEN PORT $port! ERROR NO 'ufw' OR 'firewall-cmd' COMMAND FOUND!";
+   fi   
+}
+
 
 Permissions()
 {
@@ -392,6 +415,15 @@ Update_beta()
    fi
 }
 
+Recertify_https()
+{
+   echo "creating OpenSSL self signed certificate for https. Valid for the next 365 days."
+   rm -fv /opt/jellyfin/cert/*
+   openssl req -x509 -newkey rsa:4096 -keyout /opt/jellyfin/cert/privkey.pem -out /opt/jellyfin/cert/cert.pem -days 365 -nodes -subj '/CN=jellyfin.lan'
+   openssl pkcs12 -export -out /opt/jellyfin/cert/jellyfin.pfx -inkey /opt/jellyfin/cert/privkey.pem -in /opt/jellyfin/cert/cert.pem -passout pass:
+   jellyfin -r
+}
+
 Rename_tv()
 {
    clear
@@ -500,6 +532,9 @@ Update-cli()
 
    if ( ! grep -q networkPort=8096 "/opt/jellyfin/config/jellyfin.conf" ); then
       echo "networkPort=8096" >> /opt/jellyfin/config/jellyfin.conf
+   else
+      sed -i -e "s|networkPort=.*|httpPort=8096|g" /opt/jellyfin/config/jellyfin.conf
+      echo "httpsPort=8920" >> /opt/jellyfin/config/jellyfin.conf
    fi
 
    rm -rf jellyfin-cli
@@ -556,9 +591,11 @@ if [ -n "$1" ]; then
          -v) Get_version ;;
          -vs) Version_switch ;;
          -rv) Remove_version ;;
+         -rc) Recertify_https ;;
          -rn) Rename_tv ;;
          -ls) Library_scan ;;
-         -cp) Network_port_change ;;
+         -cp) Http_port_change ;;
+         -cps) Https_port_change ;;
          -ik) Import_api_key ;;
          -X) Uninstall ;;
          *) echo "Option $1 not recognized" 

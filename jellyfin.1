@@ -8,7 +8,7 @@
 - CLI companion tool for the Jellyfin amd64.tar.gz package
 
 .SH VERSION
-.B Jellyfin - The CLI Tool - v1.4.5
+.B Jellyfin - The CLI Tool - v1.4.6
 
 .SH SYNOPSIS
 .B jellyfin
@@ -53,13 +53,17 @@ is a set of scripts to install and update the jellyfin-combined tar.gz
 .TP
 .B -vs    Switch Jellyfin version for another previously installed version.
 .TP
-.B -rn    Batch renaming script for TV shows.
-.TP
 .B -rv    Remove a Jellyfin version.
+.TP
+.B -rc    Removes old https certifications and creates new ones for the next 365 days.
+.TP
+.B -rn    Batch renaming script for TV shows.
 .TP
 .B -ls    Tell Jellyfin to scan your media library.
 .TP
-.B -cp    Change Jellyfins network port - Default = 8096.
+.B -cp    Change Jellyfins http network port - Default = 8096.
+.TP
+.B -cps   Change Jellyfins https network port - Default = 8920.
 .TP
 .B -ik    Import an API key.
 .TP
