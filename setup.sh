@@ -202,3 +202,4 @@ read -p "Press ENTER to continue" ENTER
 jellyfin -h
 read -p "Press ENTER to continue" ENTER
 systemctl status jellyfin.service
+jellyfin -U
