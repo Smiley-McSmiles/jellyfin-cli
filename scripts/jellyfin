@@ -519,30 +519,37 @@ Update-cli()
 {
    Has_sudo
    echo "Updating Jellyfin - The CLI Tool"
-   git clone https://github.com/Smiley-McSmiles/jellyfin-cli
-   cp -f jellyfin-cli/scripts/jellyfin /usr/bin/
+   echo "*** WARNING ***"
+   echo "jellyfin-cli has moved to jellyman"
+   echo "Please visit https://github.com/Smiley-McSmiles/jellyman for more information"
+   mv -v /opt/jellyfin/config/jellyfin.conf /opt/jellyfin/config/jellyman.conf
+   mv -v /bin/jellyfin /bin/jellyman
+   mv -v /usr/share/man/man1/jellyfin.1 /usr/share/man/man1/jellyman.1
+   mv -v /usr/local/share/man/man1/jellyfin.1 /usr/local/share/man/man1/jellyman.1
+   git clone https://github.com/Smiley-McSmiles/jellyman
+   cp -f jellyman/scripts/jellyman /usr/bin/
    if [ -x "$(command -v apt)" ]; then
-      cp jellyfin-cli/jellyfin.1 /usr/share/man/man1/
+      cp jellyman/jellyman.1 /usr/share/man/man1/
    elif [ -x "$(command -v dnf)" ]; then 
-      cp jellyfin-cli/jellyfin.1 /usr/local/share/man/man1/
+      cp jellyman/jellyman.1 /usr/local/share/man/man1/
    elif [ -x "$(command -v pacman)" ]; then 
-      cp jellyfin-cli/jellyfin.1 /usr/share/man/man1/
+      cp jellyman/jellyman.1 /usr/share/man/man1/
    elif [ -x "$(command -v zypper)" ]; then 
-      cp jellyfin-cli/jellyfin.1 /usr/local/share/man/man1/
+      cp jellyman/jellyman.1 /usr/local/share/man/man1/
    fi
    
-   if ( ! grep -q apiKey= "/opt/jellyfin/config/jellyfin.conf" ); then
-      echo "apiKey="* >> /opt/jellyfin/config/jellyfin.conf
+   if ( ! grep -q apiKey= "/opt/jellyfin/config/jellyman.conf" ); then
+      echo "apiKey="* >> /opt/jellyfin/config/jellyman.conf
    fi
 
    if ( ! grep -q networkPort=8096 "/opt/jellyfin/config/jellyfin.conf" ); then
-      echo "networkPort=8096" >> /opt/jellyfin/config/jellyfin.conf
+      echo "networkPort=8096" >> /opt/jellyfin/config/jellyman.conf
    else
-      sed -i -e "s|networkPort=.*|httpPort=8096|g" /opt/jellyfin/config/jellyfin.conf
-      echo "httpsPort=8920" >> /opt/jellyfin/config/jellyfin.conf
+      sed -i -e "s|networkPort=.*|httpPort=8096|g" /opt/jellyfin/config/jellyman.conf
+      echo "httpsPort=8920" >> /opt/jellyfin/config/jellyman.conf
    fi
 
-   rm -rf jellyfin-cli
+   rm -rf jellyman
    echo "...complete"
 }
 
